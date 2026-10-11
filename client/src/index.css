@@ -1,0 +1,132 @@
+/* EventHive Global Styles */
+:root {
+  --primary: #1a1a2e;
+  --primary-light: #16213e;
+  --accent: #f5a623;
+  --accent-light: #ffc107;
+  --text-dark: #1a1a2e;
+  --border-radius-lg: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #333;
+  background: #f8f9fa;
+}
+
+/* Hero gradient background */
+.hero-bg {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+}
+
+/* Smooth page transitions */
+.page-fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Accent color utilities */
+.text-accent { color: var(--accent) !important; }
+.bg-accent { background-color: var(--accent) !important; }
+.border-accent { border-color: var(--accent) !important; }
+
+/* Card hover lift — used on cards that don't have inline handlers */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Inclustion pill badges */
+.inclusion-badge {
+  background: rgba(245, 166, 35, 0.12);
+  color: #b8770a;
+  border: 1px solid rgba(245, 166, 35, 0.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+}
+
+/* Admin sidebar */
+.admin-sidebar {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.admin-sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background 0.2s, color 0.2s;
+}
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+  background: rgba(245, 166, 35, 0.15);
+  color: #f5a623;
+}
+
+/* Responsive admin layout */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-content {
+  flex: 1;
+  overflow-x: auto;
+  background: #f8f9fa;
+  padding: 2rem;
+}
+
+@media (max-width: 767px) {
+  .admin-sidebar {
+    width: 100%;
+    min-height: auto;
+  }
+  .admin-layout {
+    flex-direction: column;
+  }
+  .admin-content {
+    padding: 1rem;
+  }
+}
+
+/* Status badges */
+.status-new { background: #e3f2fd; color: #1565c0; }
+.status-contacted { background: #fff3e0; color: #e65100; }
+.status-confirmed { background: #e8f5e9; color: #2e7d32; }
+.status-cancelled { background: #fce4ec; color: #c62828; }
+
+/* Section spacing */
+.section-py { padding: 80px 0; }
+
+/* How it works step circle */
+.step-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5a623, #ff8c00);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+  box-shadow: 0 4px 16px rgba(245, 166, 35, 0.4);
+}
