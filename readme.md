@@ -415,21 +415,34 @@ VITE_API_BASE_URL=http://localhost:5000/api/v1
 git clone https://github.com/<your-username>/eventhive.git
 cd eventhive
 
-# 2. Backend
-cd server
-cp .env.example .env        # then edit the values
-npm install
-npm run seed                # optional: loads sample packages + admin user
-npm run dev                 # starts API on http://localhost:5000
+# 2. Environment files
+cp server/.env.example server/.env    # configure MongoDB & JWT secret
+cp client/.env.example client/.env
 
-# 3. Frontend (in a new terminal)
-cd client
-cp .env.example .env
-npm install
-npm run dev                 # starts app on http://localhost:5173
+# 3. Install all dependencies (root, server, and client)
+npm run install:all
+
+# 4. (Optional) Seed the database with sample packages & admin user
+npm run seed
+
+# 5. Start both servers together with ONE command
+npm run dev
 ```
 
+> **Note:** `npm run dev` from the root starts both the Express API (`http://localhost:5000`) and the Vite React client (`http://localhost:5173`) concurrently in a single terminal with color-coded prefixes (`[SERVER]` and `[CLIENT]`).
+
 ### NPM scripts
+
+**Root (`package.json`)**
+
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | **Start both backend and frontend concurrently** |
+| `npm run dev:server` | Start backend API only (`nodemon`) |
+| `npm run dev:client` | Start frontend Vite dev server only |
+| `npm run seed` | Seed database with sample packages & admin user |
+| `npm run build` | Build frontend for production |
+| `npm run install:all` | Install dependencies across root, server, and client |
 
 **server/package.json**
 
