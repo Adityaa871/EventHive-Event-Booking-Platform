@@ -572,15 +572,20 @@ Build the complete project described in this README. Follow these rules:
 
 ## 23. Definition of Done
 
-- [ ] `npm run dev` works in both `server/` and `client/` with only the `.env` files configured
-- [ ] Public users can browse, filter, and view packages
-- [ ] Public users can submit a booking and it is stored as a lead in MongoDB
-- [ ] Admin can log in, view/manage leads, and add/edit/delete packages
-- [ ] All REST endpoints behave per the spec with correct status codes and validation
-- [ ] UI is responsive across mobile, tablet and desktop
-- [ ] Code is clean, structured, and free of hard-coded secrets
-- [ ] Repository has meaningful commit history, PRs, and a proper `.gitignore`
-- [ ] README is up to date and the Postman collection is included
+- [x] `npm run dev` works in both `server/` and `client/` with only the `.env` files configured
+- [x] Public users can browse, filter, and view packages
+- [x] Public users can submit a booking and it is stored as a lead in MongoDB
+- [x] Admin can log in, view/manage leads, and add/edit/delete packages
+- [x] All REST endpoints behave per the spec with correct status codes and validation
+- [x] UI is responsive across mobile, tablet and desktop
+- [x] Code is clean, structured, and free of hard-coded secrets
+- [x] Repository has meaningful commit history, conventional commits, and a proper `.gitignore`
+- [x] README is up to date and the Postman collection is included in `/docs/postman/`
+
+### Default Admin Credentials (Seed)
+- **Email:** `admin@eventhive.com`
+- **Password:** `Admin@12345`
+- **Seed Command:** `cd server && npm run seed`
 
 ## 24. References
 
