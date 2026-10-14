@@ -1,0 +1,37 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+.btn-primary-custom {
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+  color: #000;
+  font-weight: 600;
+}
+
+.btn-primary-custom:hover {
+  background-color: #d97706;
+  border-color: #d97706;
+  color: #fff;
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
