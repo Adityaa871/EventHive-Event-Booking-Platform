@@ -11,8 +11,11 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB then start Express server
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`EventHive API Server is running on port ${PORT}`);
-    console.log(`URL: http://localhost:${PORT}`);
+    console.log(`=================================================`);
+    console.log(`🚀 EventHive API Server is running on port ${PORT}`);
+    console.log(`📡 URL: http://localhost:${PORT}`);
+    console.log(`🩺 Health: http://localhost:${PORT}/api/v1/health`);
+    console.log(`=================================================`);
   });
 });
 
