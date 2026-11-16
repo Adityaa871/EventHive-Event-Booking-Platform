@@ -10,169 +10,101 @@ const navigationLinks = [
 
 const Navbar = () => {
   const [expanded, setExpanded] = useState(false);
-
   const closeMenu = () => setExpanded(false);
-
-  const linkStyle = (isActive) => ({
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '42px',
-    padding: '8px 14px',
-    borderRadius: '7px',
-    color: isActive ? '#2457a6' : '#596579',
-    backgroundColor: isActive ? '#edf2f9' : 'transparent',
-    fontSize: '15px',
-    fontWeight: isActive ? 700 : 600,
-    lineHeight: 1.4,
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  });
 
   return (
     <nav
       className="navbar navbar-expand-lg sticky-top"
       aria-label="Main navigation"
       style={{
-        minHeight: '72px',
-        padding: '10px 0',
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e1e6ed',
-        boxShadow: '0 2px 10px rgba(32, 43, 60, 0.04)',
+        height: '68px',
+        backgroundColor: 'var(--bg-surface)',
+        borderBottom: '1px solid var(--border-subtle)',
         zIndex: 1030,
       }}
     >
       <div className="container">
+        {/* Editorial Wordmark */}
         <Link
           to="/"
           onClick={closeMenu}
           aria-label="EventHive home"
+          className="d-inline-flex align-items-center"
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            color: '#202b3c',
-            fontSize: '25px',
-            fontWeight: 800,
-            letterSpacing: '-1.2px',
-            lineHeight: 1,
             textDecoration: 'none',
-            whiteSpace: 'nowrap',
+            color: 'var(--text-primary)',
+            fontWeight: 800,
+            fontSize: '20px',
+            letterSpacing: '-0.04em',
           }}
         >
-          <span style={{ color: '#2457a6' }}>Event</span>
-          <span style={{ color: '#202b3c' }}>Hive</span>
-          <span
-            aria-hidden="true"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '25px',
-              height: '25px',
-              marginLeft: '7px',
-              borderRadius: '7px',
-              color: '#2457a6',
-              backgroundColor: '#edf2f9',
-              fontSize: '15px',
-              letterSpacing: 0,
-            }}
-          >
-            <i className="bi bi-asterisk" />
-          </span>
+          <span>Event</span>
+          <span style={{ color: 'var(--text-muted)', fontWeight: 500, marginLeft: '2px' }}>Hive</span>
         </Link>
 
+        {/* Mobile Toggle */}
         <button
           type="button"
           aria-label={expanded ? 'Close navigation menu' : 'Open navigation menu'}
           aria-expanded={expanded}
-          aria-controls="event-navbar-menu"
+          aria-controls="navbar-menu"
           onClick={() => setExpanded((current) => !current)}
-          className="navbar-toggler"
+          className="navbar-toggler border-0 p-2"
           style={{
-            width: '42px',
-            height: '42px',
-            padding: '9px',
-            border: '1px solid #e1e6ed',
-            borderRadius: '8px',
-            backgroundColor: '#ffffff',
             boxShadow: 'none',
+            color: 'var(--text-primary)',
           }}
         >
-          <span
-            aria-hidden="true"
-            style={{
-              display: 'flex',
-              height: '100%',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '5px',
-            }}
-          >
-            <span style={{ display: 'block', width: '18px', height: '2px', borderRadius: '2px', backgroundColor: '#202b3c' }} />
-            <span style={{ display: 'block', width: '18px', height: '2px', borderRadius: '2px', backgroundColor: '#202b3c' }} />
-            <span style={{ display: 'block', width: '18px', height: '2px', borderRadius: '2px', backgroundColor: '#202b3c' }} />
-          </span>
+          <i className={`bi ${expanded ? 'bi-x-lg' : 'bi-list'}`} style={{ fontSize: '1.25rem' }} />
         </button>
 
+        {/* Nav Links */}
         <div
-          id="event-navbar-menu"
+          id="navbar-menu"
           className={`collapse navbar-collapse ${expanded ? 'show' : ''}`}
+          style={{
+            backgroundColor: expanded ? 'var(--bg-surface)' : 'transparent',
+            padding: expanded ? '16px 0' : 0,
+            borderBottom: expanded ? '1px solid var(--border-subtle)' : 'none',
+          }}
         >
-          <ul
-            className="navbar-nav ms-auto align-items-lg-center"
-            style={{
-              display: 'flex',
-              gap: '8px',
-              marginTop: '0',
-              marginBottom: '0',
-              padding: '0',
-              listStyle: 'none',
-            }}
-          >
+          <ul className="navbar-nav ms-auto align-items-lg-center gap-1 mb-0">
             {navigationLinks.map(({ to, label }) => (
-              <li className="nav-item" key={to} style={{ display: 'flex', alignItems: 'center' }}>
+              <li className="nav-item" key={to}>
                 <NavLink
                   to={to}
                   end={to === '/'}
                   onClick={closeMenu}
-                  style={({ isActive }) => linkStyle(isActive)}
+                  className={({ isActive }) =>
+                    `nav-link px-3 py-2 rounded-2 ${isActive ? 'fw-bold text-dark' : 'text-secondary'}`
+                  }
+                  style={({ isActive }) => ({
+                    fontSize: '14px',
+                    fontWeight: isActive ? 600 : 500,
+                    color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    backgroundColor: isActive ? 'var(--bg-surface-subtle)' : 'transparent',
+                    transition: 'all 0.15s ease',
+                  })}
                 >
                   {label}
                 </NavLink>
               </li>
             ))}
 
-            <li
-              className="nav-item"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginLeft: '8px',
-              }}
-            >
+            <li className="nav-item ms-lg-3 mt-2 mt-lg-0">
               <Link
                 to="/book"
                 onClick={closeMenu}
+                className="btn btn-primary btn-tactile"
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minHeight: '42px',
-                  padding: '9px 18px',
-                  border: '1px solid #2457a6',
-                  borderRadius: '7px',
-                  color: '#ffffff',
-                  backgroundColor: '#2457a6',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  lineHeight: 1.4,
-                  textDecoration: 'none',
-                  whiteSpace: 'nowrap',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  letterSpacing: '-0.01em',
+                  padding: '8px 16px',
                 }}
               >
                 Plan your event
-                <i className="bi bi-arrow-right ms-2" aria-hidden="true" />
+                <i className="bi bi-arrow-right ms-2 icon-nudge" aria-hidden="true" />
               </Link>
             </li>
           </ul>
