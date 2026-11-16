@@ -130,3 +130,91 @@ body {
   margin: 0 auto 1rem;
   box-shadow: 0 4px 16px rgba(245, 166, 35, 0.4);
 }
+
+/* Minimal, consistent EventHive theme */
+:root {
+  --primary: #1a1a2e;
+  --primary-light: #1a1a2e;
+  --accent: #e5a323;
+  --accent-light: #e5a323;
+  --page-bg: #f5f5f2;
+  --surface: #f5f5f2;
+  --text-dark: #1a1a2e;
+  --bs-primary: #1a1a2e;
+  --bs-warning: #e5a323;
+  --bs-body-bg: #f5f5f2;
+  --bs-body-color: #1a1a2e;
+}
+
+html, body, #root {
+  min-height: 100%;
+  background: var(--page-bg) !important;
+  color: var(--primary) !important;
+}
+
+body { background: var(--page-bg) !important; }
+main, main > *, .admin-content, .admin-layout {
+  background-color: var(--page-bg) !important;
+}
+
+/* Flatten all inline and stylesheet gradients into the same solid navy. */
+[style*="linear-gradient"], .hero-bg, .admin-sidebar, .step-circle {
+  background: var(--primary) !important;
+  background-image: none !important;
+}
+
+/* One restrained palette across Bootstrap components and pages. */
+.bg-light, .bg-white, .card, .modal-content, .dropdown-menu,
+.form-control, .form-select, .input-group-text {
+  background-color: var(--surface) !important;
+}
+.bg-primary, .btn-primary, .navbar, footer, .admin-sidebar,
+.table thead, .btn-dark {
+  background-color: var(--primary) !important;
+  background-image: none !important;
+  color: var(--page-bg) !important;
+}
+.bg-warning, .btn-warning, .bg-accent, .step-circle {
+  background-color: var(--accent) !important;
+  background-image: none !important;
+  color: var(--primary) !important;
+}
+.text-primary, .text-dark, h1, h2, h3, h4, h5, h6,
+.navbar .nav-link, .admin-sidebar .nav-link.active,
+.admin-sidebar .nav-link:hover {
+  color: var(--primary) !important;
+}
+.text-warning, .text-accent, .border-accent {
+  color: var(--accent) !important;
+}
+.btn-primary, .btn-warning, .btn-outline-primary, .btn-outline-light,
+.btn-outline-dark {
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+.btn-primary, .btn-outline-primary {
+  border-color: var(--primary) !important;
+}
+.btn-warning {
+  border-color: var(--accent) !important;
+}
+.btn-outline-primary { color: var(--primary) !important; }
+.btn-outline-primary:hover { background: var(--primary) !important; color: var(--page-bg) !important; }
+.btn-outline-light { border-color: var(--page-bg) !important; color: var(--page-bg) !important; }
+
+.card, .navbar, footer, .admin-sidebar, .rounded-4, .rounded-3 {
+  box-shadow: none !important;
+}
+.card { border: 1px solid rgba(26, 26, 46, 0.14) !important; }
+.bg-primary-subtle, .bg-success-subtle, .bg-info-subtle,
+.bg-warning-subtle, .bg-danger-subtle, .bg-secondary-subtle,
+.status-new, .status-contacted, .status-confirmed, .status-cancelled {
+  background: rgba(229, 163, 35, 0.14) !important;
+  color: var(--primary) !important;
+}
+
+/* Remove decorative color effects that conflict with the flat visual style. */
+[style*="blur("], [style*="backdrop-filter"] { display: none !important; }
+[style*="linear-gradient"] {
+  -webkit-text-fill-color: currentColor !important;
+}

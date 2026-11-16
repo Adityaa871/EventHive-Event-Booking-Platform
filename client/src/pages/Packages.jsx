@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { getPackages } from '../services/packageService';
 import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
@@ -6,6 +6,7 @@ import PackageFilters from '../components/packages/PackageFilters';
 import PackageGrid from '../components/packages/PackageGrid';
 
 const ITEMS_PER_PAGE = 9;
+const SEARCH_DEBOUNCE_MS = 300;
 
 export default function Packages() {
   const [packages, setPackages] = useState([]);
@@ -13,47 +14,57 @@ export default function Packages() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState('');             // raw input value
+  const [debouncedSearch, setDebouncedSearch] = useState(''); // value sent to API
   const [category, setCategory] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
-  // Debounce ref
-  const debounceRef = useRef(null);
-
-  const fetchPackages = useCallback(async (searchVal, categoryVal, pageVal) => {
-    setLoading(true);
-    setError('');
-    try {
-      const params = {
-        limit: ITEMS_PER_PAGE,
-        page: pageVal,
-        ...(searchVal && { search: searchVal }),
-        ...(categoryVal && { category: categoryVal }),
-      };
-      const data = await getPackages(params);
-      setPackages(data.packages || data || []);
-      setTotalPages(data.totalPages || Math.ceil((data.total || 0) / ITEMS_PER_PAGE) || 1);
-    } catch (err) {
-      setError(err?.response?.data?.message || err?.message || 'Failed to load packages.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch on page/category change immediately
+  // Debounce the search input; resetting to page 1 happens in the same batch
   useEffect(() => {
-    fetchPackages(search, category, page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, category]);
-
-  // Debounced search
-  const handleSearchChange = (val) => {
-    setSearch(val);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
       setPage(1);
-      fetchPackages(val, category, 1);
-    }, 300);
-  };
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Single source of truth for fetching
+  useEffect(() => {
+    let ignore = false;
+
+    const load = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const params = {
+          limit: ITEMS_PER_PAGE,
+          page,
+          ...(debouncedSearch && { search: debouncedSearch }),
+          ...(category && { category }),
+        };
+        const data = await getPackages(params);
+        if (ignore) return;
+
+        const list = Array.isArray(data) ? data : data?.packages ?? [];
+        setPackages(list);
+        setTotalPages(
+          data?.totalPages ||
+            Math.ceil((data?.total || 0) / ITEMS_PER_PAGE) ||
+            1
+        );
+      } catch (err) {
+        if (ignore) return;
+        setError(err?.response?.data?.message || err?.message || 'Failed to load packages.');
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      ignore = true; // discard responses from superseded requests
+    };
+  }, [page, debouncedSearch, category, reloadKey]);
 
   const handleCategoryChange = (val) => {
     setCategory(val);
@@ -61,14 +72,20 @@ export default function Packages() {
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage < 1 || newPage > totalPages) return;
+    if (newPage < 1 || newPage > totalPages || newPage === page) return;
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleRetry = () => fetchPackages(search, category, page);
+  const handleClearFilters = () => {
+    setSearch('');
+    setDebouncedSearch('');
+    setCategory('');
+    setPage(1);
+  };
 
-  // Build pagination range
+  const handleRetry = () => setReloadKey((k) => k + 1);
+
   const getPaginationRange = () => {
     const range = [];
     const delta = 2;
@@ -87,13 +104,15 @@ export default function Packages() {
     return range;
   };
 
+  const hasFilters = Boolean(debouncedSearch || category);
+
   return (
     <>
       {/* Page Header */}
       <section
         className="py-5 text-white text-center"
         style={{
-          background: 'linear-gradient(135deg, #0d1b6e 0%, #6f42c1 100%)',
+          backgroundColor: '#0d1b6e',
           minHeight: '260px',
           display: 'flex',
           alignItems: 'center',
@@ -113,43 +132,35 @@ export default function Packages() {
       {/* Main Content */}
       <section className="py-5 bg-light">
         <div className="container">
-          {/* Filters */}
           <PackageFilters
             search={search}
             category={category}
-            onSearchChange={handleSearchChange}
+            onSearchChange={setSearch}
             onCategoryChange={handleCategoryChange}
           />
 
-          {/* Results count */}
+          {/* Results summary */}
           {!loading && !error && (
             <div className="d-flex align-items-center justify-content-between mb-4">
               <p className="text-muted mb-0 small">
                 {packages.length === 0
                   ? 'No packages found'
                   : `Showing ${packages.length} package${packages.length !== 1 ? 's' : ''}`}
-                {search && (
+                {debouncedSearch && (
                   <span>
-                    {' '}
-                    for <strong>"{search}"</strong>
+                    {' '}for <strong>"{debouncedSearch}"</strong>
                   </span>
                 )}
                 {category && (
                   <span>
-                    {' '}
-                    in <strong>{category}</strong>
+                    {' '}in <strong>{category}</strong>
                   </span>
                 )}
               </p>
-              {(search || category) && (
+              {hasFilters && (
                 <button
                   className="btn btn-sm btn-outline-secondary rounded-pill"
-                  onClick={() => {
-                    setSearch('');
-                    setCategory('');
-                    setPage(1);
-                    fetchPackages('', '', 1);
-                  }}
+                  onClick={handleClearFilters}
                 >
                   <i className="bi bi-x me-1"></i>
                   Clear Filters
@@ -158,7 +169,7 @@ export default function Packages() {
             </div>
           )}
 
-          {/* Content States */}
+          {/* Content states */}
           {loading ? (
             <div className="py-5">
               <Loader />
@@ -185,32 +196,37 @@ export default function Packages() {
                   <button
                     className="page-link rounded-pill px-3"
                     onClick={() => handlePageChange(page - 1)}
-                    aria-label="Previous"
+                    disabled={page === 1}
+                    aria-label="Previous page"
                   >
                     <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
 
-                {getPaginationRange().map((p, i) => (
-                  <li
-                    key={i}
-                    className={`page-item ${p === page ? 'active' : ''} ${p === '...' ? 'disabled' : ''}`}
-                  >
-                    <button
-                      className="page-link rounded-pill px-3"
-                      onClick={() => typeof p === 'number' && handlePageChange(p)}
-                      disabled={p === '...'}
-                    >
-                      {p}
-                    </button>
-                  </li>
-                ))}
+                {getPaginationRange().map((p, i) =>
+                  p === '...' ? (
+                    <li key={`ellipsis-${i}`} className="page-item disabled">
+                      <span className="page-link rounded-pill px-3">…</span>
+                    </li>
+                  ) : (
+                    <li key={p} className={`page-item ${p === page ? 'active' : ''}`}>
+                      <button
+                        className="page-link rounded-pill px-3"
+                        onClick={() => handlePageChange(p)}
+                        aria-current={p === page ? 'page' : undefined}
+                      >
+                        {p}
+                      </button>
+                    </li>
+                  )
+                )}
 
                 <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
                   <button
                     className="page-link rounded-pill px-3"
                     onClick={() => handlePageChange(page + 1)}
-                    aria-label="Next"
+                    disabled={page === totalPages}
+                    aria-label="Next page"
                   >
                     <i className="bi bi-chevron-right"></i>
                   </button>
