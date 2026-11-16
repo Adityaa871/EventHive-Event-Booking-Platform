@@ -320,6 +320,33 @@ a:hover .icon-nudge,
   border: 1px solid var(--status-cancelled-border);
 }
 
+/* Alerts — Flat, Grounded 1px Solid Borders */
+.alert {
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  box-shadow: none !important;
+}
+
+.alert-danger {
+  background-color: var(--status-cancelled-bg);
+  color: var(--status-cancelled-text);
+  border-color: var(--status-cancelled-border);
+}
+
+.alert-success {
+  background-color: var(--status-confirmed-bg);
+  color: var(--status-confirmed-text);
+  border-color: var(--status-confirmed-border);
+}
+
+.alert-info {
+  background-color: var(--status-contacted-bg);
+  color: var(--status-contacted-text);
+  border-color: var(--status-contacted-border);
+}
+
 /* Tables — Crisp, High-Contrast */
 .table {
   color: var(--text-primary);

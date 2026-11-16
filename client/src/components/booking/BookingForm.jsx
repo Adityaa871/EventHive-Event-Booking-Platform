@@ -33,33 +33,33 @@ const getTodayString = () => {
 const validate = (form) => {
   const errors = {};
 
-  if (!form.name.trim()) errors.name = 'Name is required.';
+  if (!form.name.trim()) errors.name = 'Full name is required.';
 
   if (!form.email.trim()) {
-    errors.email = 'Email is required.';
+    errors.email = 'Email address is required.';
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    errors.email = 'Enter a valid email address.';
+    errors.email = 'Please provide a valid email address.';
   }
 
   if (!form.phone.trim()) {
-    errors.phone = 'Phone number is required.';
+    errors.phone = 'Mobile phone number is required.';
   } else if (!/^[6-9]\d{9}$/.test(form.phone)) {
-    errors.phone = 'Enter a valid 10-digit Indian mobile number.';
+    errors.phone = 'Please provide a valid 10-digit Indian mobile number.';
   }
 
-  if (!form.eventType) errors.eventType = 'Event type is required.';
+  if (!form.eventType) errors.eventType = 'Please select an event type.';
 
   if (!form.eventDate) {
-    errors.eventDate = 'Event date is required.';
+    errors.eventDate = 'Target event date is required.';
   } else {
     const selected = new Date(form.eventDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (selected <= today) errors.eventDate = 'Event date must be a future date.';
+    if (selected <= today) errors.eventDate = 'Event date must be in the future.';
   }
 
   if (!form.guestCount) {
-    errors.guestCount = 'Guest count is required.';
+    errors.guestCount = 'Estimated guest count is required.';
   } else if (Number(form.guestCount) < 1) {
     errors.guestCount = 'Guest count must be at least 1.';
   }
@@ -120,7 +120,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
       const msg =
         err?.response?.data?.message ||
         err?.message ||
-        'Something went wrong. Please try again.';
+        'Something went wrong. Please check your submission and try again.';
       setApiError(msg);
     } finally {
       setLoading(false);
@@ -129,80 +129,91 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
   const Field = ({ label, name, required, children, hint }) => (
     <div className="mb-3">
-      <label htmlFor={name} className="form-label fw-semibold">
+      <label htmlFor={name} className="form-label d-block">
         {label} {required && <span className="text-danger">*</span>}
       </label>
       {children}
-      {hint && !errors[name] && <div className="form-text text-muted">{hint}</div>}
-      {errors[name] && <div className="invalid-feedback d-block">{errors[name]}</div>}
+      {hint && !errors[name] && <div className="form-text">{hint}</div>}
+      {errors[name] && (
+        <div className="invalid-feedback d-block mt-1" style={{ fontSize: '12px' }}>
+          {errors[name]}
+        </div>
+      )}
     </div>
   );
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       {apiError && (
-        <div className="alert alert-danger d-flex align-items-center gap-2" role="alert">
-          <i className="bi bi-exclamation-triangle-fill"></i>
+        <div
+          className="alert alert-danger d-flex align-items-center gap-2 mb-4"
+          role="alert"
+          style={{
+            borderRadius: 'var(--radius-sm)',
+            fontSize: '14px',
+            backgroundColor: 'var(--status-cancelled-bg)',
+            borderColor: 'var(--status-cancelled-border)',
+            color: 'var(--status-cancelled-text)',
+          }}
+        >
+          <i className="bi bi-exclamation-circle" aria-hidden="true" />
           <span>{apiError}</span>
         </div>
       )}
 
       <div className="row g-3">
-        {/* Name */}
+        {/* Full Name */}
         <div className="col-md-6">
           <Field label="Full Name" name="name" required>
             <input
               type="text"
               id="name"
               name="name"
-              className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-              placeholder="John Doe"
+              className={`form-control ${errors.name ? 'is-invalid border-danger' : ''}`}
+              placeholder="e.g. Priya Sharma"
               value={form.name}
               onChange={handleChange}
               autoComplete="name"
             />
-            {errors.name && <div className="invalid-feedback">{errors.name}</div>}
           </Field>
         </div>
 
-        {/* Email */}
+        {/* Email Address */}
         <div className="col-md-6">
           <Field label="Email Address" name="email" required>
             <input
               type="email"
               id="email"
               name="email"
-              className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-              placeholder="you@example.com"
+              className={`form-control ${errors.email ? 'is-invalid border-danger' : ''}`}
+              placeholder="priya@example.com"
               value={form.email}
               onChange={handleChange}
               autoComplete="email"
             />
-            {errors.email && <div className="invalid-feedback">{errors.email}</div>}
           </Field>
         </div>
 
-        {/* Phone */}
+        {/* Phone Number */}
         <div className="col-md-6">
-          <Field label="Phone Number" name="phone" required hint="10-digit Indian mobile number">
+          <Field label="Mobile Phone" name="phone" required hint="10-digit Indian mobile number">
             <input
               type="tel"
               id="phone"
               name="phone"
-              className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
+              className={`form-control ${errors.phone ? 'is-invalid border-danger' : ''}`}
               placeholder="9876543210"
               value={form.phone}
               onChange={handleChange}
               maxLength={10}
               autoComplete="tel"
             />
-            {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
           </Field>
         </div>
 
-        {/* Package */}
+        {/* Package Selector */}
         <div className="col-md-6">
-          <Field label="Package" name="package">
+          <Field label="Package Selection" name="package">
             <select
               id="package"
               name="package"
@@ -210,7 +221,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
               value={form.package}
               onChange={handleChange}
             >
-              <option value="">— No specific package —</option>
+              <option value="">— Custom or Unspecified Package —</option>
               {packages.map((pkg) => (
                 <option key={pkg._id} value={pkg._id}>
                   {pkg.title || pkg.name} {pkg.price ? `(₹${pkg.price.toLocaleString('en-IN')})` : ''}
@@ -226,63 +237,60 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
             <select
               id="eventType"
               name="eventType"
-              className={`form-select ${errors.eventType ? 'is-invalid' : ''}`}
+              className={`form-select ${errors.eventType ? 'is-invalid border-danger' : ''}`}
               value={form.eventType}
               onChange={handleChange}
             >
-              <option value="">— Select event type —</option>
+              <option value="">— Select occasion —</option>
               {eventTypes.map((et) => (
                 <option key={et.value} value={et.value}>
                   {et.label}
                 </option>
               ))}
             </select>
-            {errors.eventType && <div className="invalid-feedback">{errors.eventType}</div>}
           </Field>
         </div>
 
         {/* Event Date */}
         <div className="col-md-6">
-          <Field label="Event Date" name="eventDate" required>
+          <Field label="Target Event Date" name="eventDate" required>
             <input
               type="date"
               id="eventDate"
               name="eventDate"
-              className={`form-control ${errors.eventDate ? 'is-invalid' : ''}`}
+              className={`form-control ${errors.eventDate ? 'is-invalid border-danger' : ''}`}
               value={form.eventDate}
               onChange={handleChange}
               min={getTodayString()}
             />
-            {errors.eventDate && <div className="invalid-feedback">{errors.eventDate}</div>}
           </Field>
         </div>
 
         {/* Guest Count */}
         <div className="col-md-6">
-          <Field label="Number of Guests" name="guestCount" required>
+          <Field label="Estimated Attendees" name="guestCount" required>
             <input
               type="number"
               id="guestCount"
               name="guestCount"
-              className={`form-control ${errors.guestCount ? 'is-invalid' : ''}`}
+              className={`form-control ${errors.guestCount ? 'is-invalid border-danger' : ''}`}
               placeholder="50"
               value={form.guestCount}
               onChange={handleChange}
               min={1}
             />
-            {errors.guestCount && <div className="invalid-feedback">{errors.guestCount}</div>}
           </Field>
         </div>
 
-        {/* Venue */}
+        {/* Venue / City */}
         <div className="col-md-6">
-          <Field label="Preferred Venue" name="venue">
+          <Field label="Preferred Venue or Area" name="venue">
             <input
               type="text"
               id="venue"
               name="venue"
               className="form-control"
-              placeholder="Optional venue name or area"
+              placeholder="e.g. Hotel / Lawn in Mathura"
               value={form.venue}
               onChange={handleChange}
             />
@@ -291,13 +299,13 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Budget */}
         <div className="col-md-6">
-          <Field label="Estimated Budget (₹)" name="budget">
+          <Field label="Estimated Budget (₹ INR)" name="budget">
             <input
               type="number"
               id="budget"
               name="budget"
               className="form-control"
-              placeholder="50000"
+              placeholder="e.g. 150000"
               value={form.budget}
               onChange={handleChange}
               min={0}
@@ -307,13 +315,13 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Message */}
         <div className="col-12">
-          <Field label="Additional Notes" name="message">
+          <Field label="Specific Requirements & Special Notes" name="message">
             <textarea
               id="message"
               name="message"
               className="form-control"
               rows={4}
-              placeholder="Any special requirements or notes..."
+              placeholder="Tell us about decor preferences, catering dietary requirements, stage arrangements, or timing notes..."
               value={form.message}
               onChange={handleChange}
             />
@@ -321,11 +329,12 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
         </div>
       </div>
 
-      <div className="d-grid mt-2">
+      <div className="pt-3">
         <button
           type="submit"
-          className="btn btn-primary btn-lg"
+          className="btn btn-primary btn-tactile btn-lg w-100"
           disabled={loading}
+          style={{ padding: '12px 24px', fontSize: '15px' }}
         >
           {loading ? (
             <>
@@ -333,13 +342,13 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
                 className="spinner-border spinner-border-sm me-2"
                 role="status"
                 aria-hidden="true"
-              ></span>
-              Submitting...
+              />
+              Sending inquiry...
             </>
           ) : (
             <>
-              <i className="bi bi-calendar-check me-2"></i>
-              Confirm Booking
+              Submit event inquiry
+              <i className="bi bi-arrow-right ms-2 icon-nudge" aria-hidden="true" />
             </>
           )}
         </button>
