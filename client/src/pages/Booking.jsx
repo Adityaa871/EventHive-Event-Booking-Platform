@@ -38,147 +38,163 @@ export default function Booking() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // ── Success Confirmation ──
+  // ── Success Confirmation Screen ──
   if (bookingSuccess) {
     return (
-      <>
-        {/* Header */}
+      <div className="reveal-fade-up">
         <section
-          className="py-4 text-white text-center"
-          style={{ background: 'linear-gradient(135deg, #198754 0%, #20c997 100%)' }}
+          style={{
+            backgroundColor: 'var(--bg-surface)',
+            borderBottom: '1px solid var(--border-subtle)',
+            padding: '48px 0',
+          }}
         >
-          <div className="container py-3">
+          <div className="container text-center" style={{ maxWidth: '640px' }}>
             <div
-              className="rounded-circle bg-white d-flex align-items-center justify-content-center mx-auto mb-4"
-              style={{ width: '80px', height: '80px' }}
+              className="d-inline-flex align-items-center justify-content-center mb-3"
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--status-confirmed-bg)',
+                border: '1px solid var(--status-confirmed-border)',
+                color: 'var(--status-confirmed-text)',
+              }}
             >
-              <i className="bi bi-check-lg text-success" style={{ fontSize: '2.5rem' }}></i>
+              <i className="bi bi-check2" style={{ fontSize: '1.75rem' }} aria-hidden="true" />
             </div>
-            <h1 className="display-6 fw-bold mb-2">Booking Confirmed! 🎉</h1>
-            <p className="lead opacity-80 mb-0">
-              Thank you for choosing EventHive. We've received your booking request.
+            <h1 className="h3 fw-bold mb-2">Booking Inquiry Received</h1>
+            <p className="text-secondary mb-0">
+              Thank you for submitting your event details. A dedicated coordinator has been assigned to your request.
             </p>
           </div>
         </section>
 
         <section className="py-5">
           <div className="container" style={{ maxWidth: '680px' }}>
-            <div className="card border-0 shadow-sm rounded-4 p-4 p-lg-5 text-center">
-              <i className="bi bi-envelope-check-fill text-primary fs-1 mb-4"></i>
-              <h4 className="fw-bold mb-3">What Happens Next?</h4>
-              <div className="row g-4 text-start mb-5">
+            <div
+              className="p-4 p-md-5 card-tactile"
+              style={{ backgroundColor: 'var(--bg-surface)' }}
+            >
+              <h2 className="h5 fw-bold mb-4 pb-2 border-bottom">Next Steps</h2>
+              <div className="d-flex flex-column gap-4 mb-5">
                 {[
                   {
                     step: '1',
-                    icon: 'bi-envelope',
-                    color: 'primary',
-                    title: 'Confirmation Email',
-                    desc: "You'll receive a booking confirmation email within a few minutes.",
+                    title: 'Availability & Schedule Check',
+                    desc: 'We verify our vendor network, venue access, and logistics for your selected date.',
                   },
                   {
                     step: '2',
-                    icon: 'bi-telephone',
-                    color: 'success',
-                    title: "We'll Call You",
-                    desc: 'Our event coordinator will call you within 24 hours to discuss your requirements.',
+                    title: 'Direct Phone Consultation',
+                    desc: 'Our planner will phone you within 24 business hours to finalize scope, styling, and specific additions.',
                   },
                   {
                     step: '3',
-                    icon: 'bi-balloon-heart',
-                    color: 'warning',
-                    title: 'Plan & Celebrate',
-                    desc: "We'll finalize every detail and make your event absolutely unforgettable!",
+                    title: 'Proposal & Date Confirmation',
+                    desc: 'We provide an itemized quote and formal contract with clear milestone timelines.',
                   },
                 ].map((item) => (
-                  <div key={item.step} className="col-12">
-                    <div className="d-flex align-items-start gap-3">
-                      <div
-                        className={`rounded-circle bg-${item.color} bg-opacity-10 d-flex align-items-center justify-content-center flex-shrink-0`}
-                        style={{ width: '48px', height: '48px' }}
-                      >
-                        <i className={`bi ${item.icon} text-${item.color}`}></i>
+                  <div key={item.step} className="d-flex gap-3 align-items-start">
+                    <span
+                      className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: 'var(--radius-sm)',
+                        backgroundColor: 'var(--bg-surface-subtle)',
+                        border: '1px solid var(--border-subtle)',
+                        fontSize: '12px',
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      {item.step}
+                    </span>
+                    <div>
+                      <div className="fw-bold" style={{ fontSize: '14px', color: 'var(--text-primary)' }}>
+                        {item.title}
                       </div>
-                      <div>
-                        <h6 className="fw-bold mb-1">{item.title}</h6>
-                        <p className="text-muted small mb-0">{item.desc}</p>
-                      </div>
+                      <p className="small text-muted mb-0 mt-1">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="d-flex gap-3 justify-content-center flex-wrap">
+              <div className="d-flex gap-3 justify-content-center flex-wrap pt-3 border-top">
                 <button
-                  className="btn btn-primary rounded-pill px-5"
+                  type="button"
+                  className="btn btn-outline-primary btn-tactile"
                   onClick={() => setBookingSuccess(false)}
                 >
-                  <i className="bi bi-plus-circle me-2"></i>
-                  Book Another Event
+                  Book another event
                 </button>
-                <Link to="/" className="btn btn-outline-secondary rounded-pill px-5">
-                  <i className="bi bi-house me-2"></i>
-                  Go Home
+                <Link to="/" className="btn btn-primary btn-tactile">
+                  Return to home
                 </Link>
               </div>
 
-              <p className="text-muted small mt-4 mb-0">
-                Questions? Call us:{' '}
-                <a href="tel:+919876543210" className="text-primary fw-semibold">
+              <p className="text-center text-muted small mt-4 mb-0">
+                Questions right now? Call us directly at{' '}
+                <a href="tel:+919876543210" className="fw-semibold text-dark">
                   +91 98765 43210
                 </a>
               </p>
             </div>
           </div>
         </section>
-      </>
+      </div>
     );
   }
 
-  // ── Booking Form Page ──
+  // ── Booking Inquiry Form Page ──
   return (
-    <>
-      {/* Header */}
+    <div className="reveal-fade-up">
+      {/* ── Page Header ── */}
       <section
-        className="py-5 text-white text-center"
         style={{
-          background: 'linear-gradient(135deg, #6f42c1 0%, #0d6efd 100%)',
-          minHeight: '280px',
-          display: 'flex',
-          alignItems: 'center',
+          backgroundColor: 'var(--bg-surface)',
+          borderBottom: '1px solid var(--border-subtle)',
+          paddingTop: '48px',
+          paddingBottom: '48px',
         }}
       >
-        <div className="container py-3">
-          <span className="badge bg-white bg-opacity-15 text-white fw-normal mb-3 px-3 py-2">
-            Let's Get Started
-          </span>
-          <h1 className="display-5 fw-bold mb-2">Book Your Event</h1>
-          <p className="lead opacity-75 mb-0 mx-auto" style={{ maxWidth: '520px' }}>
-            Fill in the form below and our team will get back to you within 24 hours to confirm
-            your booking.
+        <div className="container">
+          <div className="d-inline-flex align-items-center gap-2 mb-2 text-muted small text-uppercase fw-semibold" style={{ letterSpacing: '0.06em' }}>
+            <span>Booking Request</span>
+            <span>•</span>
+            <span>Custom Quote</span>
+          </div>
+          <h1 className="h2 fw-bold mb-2">Plan Your Event</h1>
+          <p className="text-secondary mb-0" style={{ maxWidth: '580px' }}>
+            Provide your event requirements below. Our event production team will review availability and prepare a comprehensive proposal.
           </p>
         </div>
       </section>
 
-      <section className="py-5 bg-light">
+      {/* ── Main Form Section ── */}
+      <section className="py-5">
         <div className="container">
-          <div className="row justify-content-center g-5">
+          <div className="row g-5">
             {/* Form Column */}
             <div className="col-lg-8">
-              <div className="card border-0 shadow-sm rounded-4 p-4 p-lg-5">
-                <div className="mb-4">
-                  <h3 className="fw-bold mb-1">Booking Details</h3>
-                  <p className="text-muted mb-0 small">
-                    Fields marked with <span className="text-danger">*</span> are required.
+              <div
+                className="p-4 p-md-5 card-tactile"
+                style={{ backgroundColor: 'var(--bg-surface)' }}
+              >
+                <div className="mb-4 pb-3 border-bottom">
+                  <h2 className="h4 fw-bold mb-1">Event Inquiries & Coordination</h2>
+                  <p className="text-muted small mb-0">
+                    Fields marked with <span className="text-danger">*</span> are mandatory for schedule verification.
                   </p>
                 </div>
 
                 {loadingPackages ? (
-                  <div className="py-4">
+                  <div className="py-4 text-center">
                     <Loader />
                   </div>
                 ) : packagesError ? (
                   <div className="mb-4">
-                    <ErrorMessage message={packagesError} onRetry={fetchPackages} />
+                    <ErrorMessage message={packagesError} />
                   </div>
                 ) : null}
 
@@ -192,78 +208,79 @@ export default function Booking() {
               </div>
             </div>
 
-            {/* Sidebar */}
+            {/* Sidebar Column */}
             <div className="col-lg-4">
-              {/* Why Us */}
-              <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h6 className="fw-bold mb-3">
-                  <i className="bi bi-stars text-warning me-2"></i>
-                  Why Choose EventHive?
-                </h6>
-                <ul className="list-unstyled mb-0">
+              {/* Trust Callout */}
+              <div
+                className="p-4 mb-4 card-tactile"
+                style={{ backgroundColor: 'var(--bg-surface)' }}
+              >
+                <h3 className="h6 fw-bold mb-3 text-uppercase" style={{ letterSpacing: '0.05em' }}>
+                  What to expect
+                </h3>
+                <ul className="list-unstyled d-flex flex-column gap-3 mb-0" style={{ fontSize: '13px' }}>
                   {[
-                    'Free initial consultation',
-                    '10+ years of experience',
-                    '500+ successful events',
-                    '100% satisfaction guarantee',
-                    'Transparent pricing',
-                    'Dedicated event coordinator',
+                    'Direct contact with a dedicated regional coordinator',
+                    'Zero hidden fees or surprise vendor markups',
+                    'Transparent milestones and vendor scheduling',
+                    'Backup contingency planning for outdoor events',
                   ].map((item, i) => (
-                    <li key={i} className="d-flex align-items-center gap-2 mb-2">
-                      <i className="bi bi-check-circle-fill text-success flex-shrink-0 small"></i>
-                      <span className="small text-muted">{item}</span>
+                    <li key={i} className="d-flex align-items-start gap-2 text-secondary">
+                      <i className="bi bi-check2 text-dark fw-bold mt-1" aria-hidden="true" />
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Contact Info */}
-              <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h6 className="fw-bold mb-3">
-                  <i className="bi bi-headset text-primary me-2"></i>
-                  Need Help?
-                </h6>
+              {/* Direct Help */}
+              <div
+                className="p-4 mb-4 card-tactile"
+                style={{ backgroundColor: 'var(--bg-surface)' }}
+              >
+                <h3 className="h6 fw-bold mb-2">Need immediate assistance?</h3>
                 <p className="text-muted small mb-3">
-                  Prefer to talk to someone? Our team is available 6 days a week.
+                  Our planning office is available Monday through Saturday, 9 AM to 7 PM IST.
                 </p>
-                <a
-                  href="tel:+919876543210"
-                  className="btn btn-outline-primary btn-sm rounded-pill w-100 mb-2"
-                >
-                  <i className="bi bi-telephone me-2"></i>
-                  +91 98765 43210
-                </a>
-                <a
-                  href="mailto:hello@eventhive.in"
-                  className="btn btn-outline-secondary btn-sm rounded-pill w-100"
-                >
-                  <i className="bi bi-envelope me-2"></i>
-                  hello@eventhive.in
-                </a>
+                <div className="d-flex flex-column gap-2">
+                  <a
+                    href="tel:+919876543210"
+                    className="btn btn-outline-secondary btn-tactile btn-sm w-100 justify-content-center"
+                  >
+                    <i className="bi bi-telephone me-2" aria-hidden="true" />
+                    +91 98765 43210
+                  </a>
+                  <a
+                    href="mailto:hello@eventhive.in"
+                    className="btn btn-outline-secondary btn-tactile btn-sm w-100 justify-content-center"
+                  >
+                    <i className="bi bi-envelope me-2" aria-hidden="true" />
+                    hello@eventhive.in
+                  </a>
+                </div>
               </div>
 
-              {/* Browse Packages */}
+              {/* Explore Packages */}
               <div
-                className="card border-0 rounded-4 p-4 text-white"
-                style={{ background: 'linear-gradient(135deg, #6f42c1, #0d6efd)' }}
+                className="p-4 card-tactile"
+                style={{ backgroundColor: 'var(--bg-surface-subtle)' }}
               >
-                <h6 className="fw-bold mb-2">Not sure which package?</h6>
-                <p className="small opacity-75 mb-3">
-                  Browse our full catalogue and find the perfect fit for your occasion.
+                <h3 className="h6 fw-bold mb-1">Looking for package inspiration?</h3>
+                <p className="small text-muted mb-3">
+                  Check pre-assembled wedding, birthday, and corporate packages before submitting.
                 </p>
                 <Link
                   to="/packages"
-                  className="btn btn-light btn-sm rounded-pill fw-semibold"
-                  style={{ color: '#6f42c1' }}
+                  className="btn btn-primary btn-tactile btn-sm w-100 justify-content-center"
                 >
-                  <i className="bi bi-grid me-2"></i>
-                  Browse Packages
+                  Browse catalog
+                  <i className="bi bi-arrow-right ms-2 icon-nudge" aria-hidden="true" />
                 </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

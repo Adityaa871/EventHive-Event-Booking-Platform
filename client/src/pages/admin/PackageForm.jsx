@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import Loader from '../../components/common/Loader';
 import ErrorMessage from '../../components/common/ErrorMessage';
@@ -171,51 +171,71 @@ const PackageForm = () => {
     ) : null;
 
   return (
-    <div className="d-flex" style={{ minHeight: '100vh', background: '#f0f4f8' }}>
+    <div className="d-flex" style={{ minHeight: '100vh', backgroundColor: 'var(--bg-canvas)' }}>
       <AdminSidebar />
 
-      <main className="flex-grow-1 p-4">
+      <main className="flex-grow-1 p-4 p-lg-5">
         {/* Header */}
         <div className="mb-4">
-          <h4 className="fw-bold mb-0" style={{ color: '#0d1b2a' }}>
-            {isEditMode ? '✏️ Edit Package' : '➕ New Package'}
-          </h4>
-          <p className="text-muted small mb-0">
-            {isEditMode ? 'Update the package details below.' : 'Fill in the details to create a new event package.'}
+          <div className="mb-2">
+            <Link to="/admin/packages" className="text-secondary small text-decoration-none">
+              ← Back to packages
+            </Link>
+          </div>
+          <h1 className="h4 fw-bold tracking-tight mb-1">
+            {isEditMode ? 'Edit Package' : 'Create New Package'}
+          </h1>
+          <p className="text-secondary small mb-0">
+            {isEditMode
+              ? 'Update the package details, pricing, and inclusions below.'
+              : 'Fill in the specifications to add a new event package to your catalog.'}
           </p>
         </div>
 
         {loadingPackage ? (
-          <Loader />
+          <div className="p-5 text-center">
+            <Loader />
+          </div>
         ) : fetchError ? (
           <ErrorMessage message={fetchError} />
         ) : (
           <form onSubmit={handleSubmit} noValidate>
             <div className="row g-4">
-              {/* Left Column */}
+              {/* Left Column — Package Details */}
               <div className="col-12 col-lg-8">
-                <div className="card border-0 shadow-sm mb-4">
+                <div
+                  className="card-tactile overflow-hidden mb-4"
+                  style={{
+                    backgroundColor: 'var(--bg-surface)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
                   <div
-                    className="card-header border-0 fw-semibold"
-                    style={{ background: '#0d1b2a', color: '#f5a623' }}
+                    className="p-3 px-4 border-bottom fw-bold small text-uppercase"
+                    style={{
+                      letterSpacing: '0.04em',
+                      backgroundColor: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
+                    }}
                   >
-                    📝 Package Information
+                    Package Information
                   </div>
-                  <div className="card-body p-4">
+                  <div className="p-4">
                     {submitError && (
-                      <div className="alert alert-danger py-2 px-3 small">{submitError}</div>
+                      <div className="alert alert-danger py-2 px-3 small mb-4">{submitError}</div>
                     )}
 
                     {/* Title */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">
-                        Title <span className="text-danger">*</span>
+                      <label className="form-label">
+                        Package Title <span className="text-danger">*</span>
                       </label>
                       <input
                         type="text"
                         name="title"
                         className={`form-control ${fieldErrors.title ? 'is-invalid' : ''}`}
-                        placeholder="e.g. Royal Wedding Package"
+                        placeholder="e.g. Royal Wedding Reception"
                         value={formData.title}
                         onChange={handleChange}
                       />
@@ -224,7 +244,7 @@ const PackageForm = () => {
 
                     {/* Category */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">
+                      <label className="form-label">
                         Category <span className="text-danger">*</span>
                       </label>
                       <select
@@ -233,7 +253,7 @@ const PackageForm = () => {
                         value={formData.category}
                         onChange={handleChange}
                       >
-                        <option value="">Select a category…</option>
+                        <option value="">Select an occasion category…</option>
                         {CATEGORIES.map((cat) => (
                           <option key={cat} value={cat} className="text-capitalize">
                             {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -245,17 +265,19 @@ const PackageForm = () => {
 
                     {/* Short Description */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">
-                        Short Description <span className="text-danger">*</span>
-                        <span className="text-muted small ms-2 fw-normal">
-                          ({formData.shortDescription.length}/200)
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <label className="form-label mb-0">
+                          Short Summary Tagline <span className="text-danger">*</span>
+                        </label>
+                        <span className="text-muted small">
+                          {formData.shortDescription.length}/200
                         </span>
-                      </label>
+                      </div>
                       <input
                         type="text"
                         name="shortDescription"
                         className={`form-control ${fieldErrors.shortDescription ? 'is-invalid' : ''}`}
-                        placeholder="A brief tagline for the package"
+                        placeholder="A concise one-line highlight for cards and previews"
                         value={formData.shortDescription}
                         onChange={handleChange}
                         maxLength={200}
@@ -265,14 +287,14 @@ const PackageForm = () => {
 
                     {/* Description */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">
+                      <label className="form-label">
                         Full Description <span className="text-danger">*</span>
                       </label>
                       <textarea
                         name="description"
                         rows={5}
                         className={`form-control ${fieldErrors.description ? 'is-invalid' : ''}`}
-                        placeholder="Detailed description of the package…"
+                        placeholder="Detailed narrative describing the experience, flow, and venue arrangement…"
                         value={formData.description}
                         onChange={handleChange}
                       />
@@ -281,8 +303,8 @@ const PackageForm = () => {
 
                     {/* Inclusions */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">
-                        Inclusions
+                      <label className="form-label">
+                        Inclusions & Services
                         <span className="text-muted small ms-2 fw-normal">
                           (comma-separated)
                         </span>
@@ -291,18 +313,18 @@ const PackageForm = () => {
                         type="text"
                         name="inclusions"
                         className="form-control"
-                        placeholder="e.g. Decoration, Catering, Photography"
+                        placeholder="e.g. Venue Styling, 4-Course Catering, Candid Photography, Sound System"
                         value={formData.inclusions}
                         onChange={handleChange}
                       />
                       <div className="form-text">
-                        Separate each inclusion with a comma.
+                        Separate each deliverable item with a comma.
                       </div>
                     </div>
 
                     {/* Images */}
                     <div className="mb-0">
-                      <label className="form-label fw-medium">
+                      <label className="form-label">
                         Image URLs
                         <span className="text-muted small ms-2 fw-normal">
                           (comma-separated)
@@ -312,31 +334,42 @@ const PackageForm = () => {
                         type="text"
                         name="images"
                         className="form-control"
-                        placeholder="https://…, https://…"
+                        placeholder="https://example.com/photo1.jpg, https://example.com/photo2.jpg"
                         value={formData.images}
                         onChange={handleChange}
                       />
-                      <div className="form-text">Paste full image URLs, separated by commas.</div>
+                      <div className="form-text">Paste full HTTPS image URLs, separated by commas.</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Right Column */}
+              {/* Right Column — Pricing, Parameters & Settings */}
               <div className="col-12 col-lg-4">
-                {/* Pricing & Details */}
-                <div className="card border-0 shadow-sm mb-4">
+                {/* Pricing & Logistics */}
+                <div
+                  className="card-tactile overflow-hidden mb-4"
+                  style={{
+                    backgroundColor: 'var(--bg-surface)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
                   <div
-                    className="card-header border-0 fw-semibold"
-                    style={{ background: '#0d1b2a', color: '#f5a623' }}
+                    className="p-3 px-4 border-bottom fw-bold small text-uppercase"
+                    style={{
+                      letterSpacing: '0.04em',
+                      backgroundColor: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
+                    }}
                   >
-                    💰 Pricing & Details
+                    Pricing & Logistics
                   </div>
-                  <div className="card-body p-4">
+                  <div className="p-4">
                     {/* Price */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">
-                        Price (₹) <span className="text-danger">*</span>
+                      <label className="form-label">
+                        Price (₹ INR) <span className="text-danger">*</span>
                       </label>
                       <input
                         type="number"
@@ -344,7 +377,7 @@ const PackageForm = () => {
                         min="0"
                         step="0.01"
                         className={`form-control ${fieldErrors.price ? 'is-invalid' : ''}`}
-                        placeholder="e.g. 50000"
+                        placeholder="e.g. 75000"
                         value={formData.price}
                         onChange={handleChange}
                       />
@@ -353,13 +386,13 @@ const PackageForm = () => {
 
                     {/* Capacity */}
                     <div className="mb-3">
-                      <label className="form-label fw-medium">Capacity</label>
+                      <label className="form-label">Guest Capacity</label>
                       <input
                         type="number"
                         name="capacity"
                         min="0"
                         className={`form-control ${fieldErrors.capacity ? 'is-invalid' : ''}`}
-                        placeholder="e.g. 100"
+                        placeholder="e.g. 150"
                         value={formData.capacity}
                         onChange={handleChange}
                       />
@@ -368,12 +401,12 @@ const PackageForm = () => {
 
                     {/* Duration */}
                     <div className="mb-0">
-                      <label className="form-label fw-medium">Duration</label>
+                      <label className="form-label">Event Duration</label>
                       <input
                         type="text"
                         name="duration"
                         className="form-control"
-                        placeholder="e.g. 4 hours, Full day"
+                        placeholder="e.g. 6 hours, Full day"
                         value={formData.duration}
                         onChange={handleChange}
                       />
@@ -381,15 +414,26 @@ const PackageForm = () => {
                   </div>
                 </div>
 
-                {/* Settings */}
-                <div className="card border-0 shadow-sm mb-4">
+                {/* Catalog Settings */}
+                <div
+                  className="card-tactile overflow-hidden mb-4"
+                  style={{
+                    backgroundColor: 'var(--bg-surface)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                  }}
+                >
                   <div
-                    className="card-header border-0 fw-semibold"
-                    style={{ background: '#0d1b2a', color: '#f5a623' }}
+                    className="p-3 px-4 border-bottom fw-bold small text-uppercase"
+                    style={{
+                      letterSpacing: '0.04em',
+                      backgroundColor: 'var(--bg-surface)',
+                      color: 'var(--text-primary)',
+                    }}
                   >
-                    ⚙️ Settings
+                    Catalog Settings
                   </div>
-                  <div className="card-body p-4">
+                  <div className="p-4">
                     <div className="form-check form-switch mb-3">
                       <input
                         className="form-check-input"
@@ -399,10 +443,10 @@ const PackageForm = () => {
                         checked={formData.isFeatured}
                         onChange={handleChange}
                       />
-                      <label className="form-check-label fw-medium" htmlFor="isFeatured">
-                        ⭐ Featured Package
+                      <label className="form-check-label fw-semibold text-dark" htmlFor="isFeatured">
+                        Featured Package
                       </label>
-                      <div className="form-text">Show on homepage featured section.</div>
+                      <div className="form-text">Display in the curated highlight strip on the homepage.</div>
                     </div>
                     <div className="form-check form-switch">
                       <input
@@ -413,10 +457,10 @@ const PackageForm = () => {
                         checked={formData.isActive}
                         onChange={handleChange}
                       />
-                      <label className="form-check-label fw-medium" htmlFor="isActive">
-                        ✅ Active
+                      <label className="form-check-label fw-semibold text-dark" htmlFor="isActive">
+                        Active in Catalog
                       </label>
-                      <div className="form-text">Inactive packages are hidden from clients.</div>
+                      <div className="form-text">When unchecked, package is hidden from client searches.</div>
                     </div>
                   </div>
                 </div>
@@ -425,8 +469,7 @@ const PackageForm = () => {
                 <div className="d-grid gap-2">
                   <button
                     type="submit"
-                    className="btn fw-semibold py-2"
-                    style={{ background: '#f5a623', color: '#0d1b2a', border: 'none' }}
+                    className="btn btn-primary btn-tactile py-2 fw-semibold"
                     disabled={submitting}
                   >
                     {submitting ? (
@@ -436,17 +479,17 @@ const PackageForm = () => {
                           role="status"
                           aria-hidden="true"
                         />
-                        {isEditMode ? 'Updating…' : 'Creating…'}
+                        {isEditMode ? 'Updating…' : 'Saving…'}
                       </>
                     ) : isEditMode ? (
-                      '💾 Update Package'
+                      'Update Package'
                     ) : (
-                      '✅ Create Package'
+                      'Create Package'
                     )}
                   </button>
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="btn btn-outline-secondary btn-tactile py-2"
                     onClick={() => navigate('/admin/packages')}
                     disabled={submitting}
                   >

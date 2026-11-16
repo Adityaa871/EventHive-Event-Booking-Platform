@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { login } from '../../services/authService';
 
@@ -11,7 +11,7 @@ const AdminLogin = () => {
   const { admin, loginAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+  // Redirect if already authenticated
   useEffect(() => {
     if (admin) {
       navigate('/admin', { replace: true });
@@ -27,9 +27,8 @@ const AdminLogin = () => {
     e.preventDefault();
 
     const { email, password } = formData;
-
     if (!email.trim()) {
-      setError('Email is required.');
+      setError('Email address is required.');
       return;
     }
     if (!password.trim()) {
@@ -45,7 +44,7 @@ const AdminLogin = () => {
       navigate('/admin', { replace: true });
     } catch (err) {
       setError(
-        err?.response?.data?.message || err?.message || 'Invalid credentials. Please try again.'
+        err?.response?.data?.message || err?.message || 'Invalid credentials. Please verify your email and password.'
       );
     } finally {
       setLoading(false);
@@ -54,37 +53,67 @@ const AdminLogin = () => {
 
   return (
     <div
-      className="min-vh-100 d-flex align-items-center justify-content-center"
-      style={{ background: 'linear-gradient(135deg, #0d1b2a 0%, #1b2a3b 60%, #f5a623 100%)' }}
+      className="min-vh-100 d-flex align-items-center justify-content-center p-3 reveal-fade-up"
+      style={{ backgroundColor: '#111113' }}
     >
-      <div className="card shadow-lg border-0" style={{ width: '100%', maxWidth: '420px' }}>
+      <div
+        className="w-100"
+        style={{
+          maxWidth: '400px',
+          backgroundColor: '#18181b',
+          border: '1px solid #27272a',
+          borderRadius: 'var(--radius-lg)',
+          overflow: 'hidden',
+        }}
+      >
         {/* Card Header */}
         <div
-          className="card-header text-center py-4 border-0"
-          style={{ background: '#0d1b2a', borderRadius: '0.375rem 0.375rem 0 0' }}
+          className="p-4 text-center"
+          style={{ borderBottom: '1px solid #27272a' }}
         >
-          <h2 className="mb-0 fw-bold" style={{ color: '#f5a623', letterSpacing: '1px' }}>
-            🐝 EventHive
-          </h2>
-          <p className="mb-0 mt-1 text-white-50 small">Admin Portal</p>
+          <div className="d-inline-flex align-items-center gap-2 mb-2">
+            <span className="fw-bold text-white fs-5" style={{ letterSpacing: '-0.03em' }}>
+              EventHive
+            </span>
+            <span
+              className="badge"
+              style={{
+                backgroundColor: '#27272a',
+                color: '#a1a1aa',
+                fontSize: '10px',
+                padding: '2px 6px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+              }}
+            >
+              Portal
+            </span>
+          </div>
+          <p className="small text-white-50 mb-0">Sign in to access inquiries and packages</p>
         </div>
 
         {/* Card Body */}
-        <div className="card-body p-4" style={{ background: '#1b2a3b' }}>
-          <h5 className="text-white mb-4 text-center fw-semibold">Sign In to Dashboard</h5>
-
+        <div className="p-4">
           {error && (
-            <div className="alert alert-danger d-flex align-items-center py-2 px-3" role="alert">
-              <span className="me-2">⚠️</span>
-              <span className="small">{error}</span>
+            <div
+              className="alert d-flex align-items-center gap-2 py-2 px-3 mb-4 small"
+              role="alert"
+              style={{
+                backgroundColor: '#2b1517',
+                border: '1px solid #491b1f',
+                color: '#f87171',
+                borderRadius: 'var(--radius-sm)',
+              }}
+            >
+              <i className="bi bi-exclamation-circle flex-shrink-0" aria-hidden="true" />
+              <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} noValidate>
-            {/* Email */}
             <div className="mb-3">
               <label htmlFor="email" className="form-label text-white-50 small mb-1">
-                Email Address
+                Email address
               </label>
               <input
                 id="email"
@@ -97,14 +126,13 @@ const AdminLogin = () => {
                 disabled={loading}
                 autoComplete="username"
                 style={{
-                  background: '#0d1b2a',
-                  border: '1px solid #2e4057',
-                  color: '#fff',
+                  backgroundColor: '#111113',
+                  border: '1px solid #27272a',
+                  color: '#ffffff',
                 }}
               />
             </div>
 
-            {/* Password */}
             <div className="mb-4">
               <label htmlFor="password" className="form-label text-white-50 small mb-1">
                 Password
@@ -120,23 +148,22 @@ const AdminLogin = () => {
                 disabled={loading}
                 autoComplete="current-password"
                 style={{
-                  background: '#0d1b2a',
-                  border: '1px solid #2e4057',
-                  color: '#fff',
+                  backgroundColor: '#111113',
+                  border: '1px solid #27272a',
+                  color: '#ffffff',
                 }}
               />
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
-              className="btn w-100 fw-semibold py-2"
+              className="btn btn-tactile w-100 py-2 fw-semibold"
               disabled={loading}
               style={{
-                background: '#f5a623',
-                color: '#0d1b2a',
-                border: 'none',
-                fontSize: '1rem',
+                backgroundColor: '#ffffff',
+                color: '#18181b',
+                border: '1px solid #ffffff',
+                fontSize: '14px',
               }}
             >
               {loading ? (
@@ -146,20 +173,25 @@ const AdminLogin = () => {
                     role="status"
                     aria-hidden="true"
                   />
-                  Signing In…
+                  Authenticating...
                 </>
               ) : (
-                'Sign In'
+                'Sign in'
               )}
             </button>
           </form>
-        </div>
 
-        <div
-          className="card-footer text-center py-2 border-0"
-          style={{ background: '#152232', borderRadius: '0 0 0.375rem 0.375rem' }}
-        >
-          <small className="text-white-50">EventHive Admin &copy; {new Date().getFullYear()}</small>
+          <div className="text-center mt-4 pt-2">
+            <Link
+              to="/"
+              className="text-white-50 small"
+              style={{ textDecoration: 'none', transition: 'color 0.15s ease' }}
+              onMouseEnter={(e) => (e.target.style.color = '#ffffff')}
+              onMouseLeave={(e) => (e.target.style.color = 'rgba(255, 255, 255, 0.5)')}
+            >
+              ← Back to public website
+            </Link>
+          </div>
         </div>
       </div>
     </div>
