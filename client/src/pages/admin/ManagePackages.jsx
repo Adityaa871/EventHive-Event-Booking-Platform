@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import Loader from '../../components/common/Loader';
@@ -47,102 +47,75 @@ const ManagePackages = () => {
   };
 
   return (
-    <div className="d-flex" style={{ minHeight: '100vh', backgroundColor: 'var(--bg-canvas)' }}>
+    <div className="d-flex" style={{ minHeight: '100vh', background: '#f0f4f8' }}>
       <AdminSidebar />
 
-      <main className="flex-grow-1 p-4 p-lg-5">
+      <main className="flex-grow-1 p-4">
         {/* Header */}
-        <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
           <div>
-            <h1 className="h4 fw-bold tracking-tight mb-1">Manage Packages</h1>
-            <p className="text-secondary small mb-0">
-              Create, edit, and configure your event catalog offerings.
+            <h4 className="fw-bold mb-0" style={{ color: '#0d1b2a' }}>
+              📦 Manage Packages
+            </h4>
+            <p className="text-muted small mb-0">
+              Create, edit, and manage all event packages.
             </p>
           </div>
           <Link
             to="/admin/packages/new"
-            className="btn btn-primary btn-tactile"
+            className="btn fw-semibold"
+            style={{ background: '#f5a623', color: '#0d1b2a', border: 'none' }}
           >
-            <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-            New Package
+            + Add New Package
           </Link>
         </div>
 
-        {/* Table / Content */}
+        {/* Table */}
         {loading ? (
-          <div className="p-5 text-center">
-            <Loader />
-          </div>
+          <Loader />
         ) : error ? (
           <ErrorMessage message={error} />
         ) : packages.length === 0 ? (
-          <div
-            className="p-5 text-center text-muted card-tactile"
-            style={{
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-            }}
-          >
-            <i className="bi bi-box-seam fs-2 d-block mb-3 text-muted" aria-hidden="true" />
-            <h2 className="h5 fw-bold text-dark mb-2">No packages in catalog</h2>
-            <p className="text-secondary small mb-4">Start creating your tailored event packages for prospective clients.</p>
+          <div className="text-center text-muted py-5">
+            <p className="mb-3">No packages found.</p>
             <Link
               to="/admin/packages/new"
-              className="btn btn-primary btn-tactile"
+              className="btn"
+              style={{ background: '#f5a623', color: '#0d1b2a', border: 'none' }}
             >
-              <i className="bi bi-plus-lg me-2" aria-hidden="true" />
-              Create First Package
+              Create Your First Package
             </Link>
           </div>
         ) : (
-          <div
-            className="card-tactile overflow-hidden"
-            style={{
-              backgroundColor: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-            }}
-          >
+          <div className="card border-0 shadow-sm">
             <div className="table-responsive">
-              <table className="table align-middle">
-                <thead>
+              <table className="table table-hover align-middle mb-0">
+                <thead style={{ background: '#0d1b2a', color: '#f5a623' }}>
                   <tr>
-                    <th className="px-4">Title</th>
+                    <th className="px-3">Title</th>
                     <th>Category</th>
                     <th>Price</th>
                     <th>Capacity</th>
                     <th>Featured</th>
                     <th>Status</th>
-                    <th className="text-end px-4">Actions</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {packages.map((pkg) => (
                     <tr key={pkg._id}>
-                      <td className="px-4">
-                        <div className="fw-semibold text-dark">{pkg.title}</div>
-                        <div className="text-muted small text-truncate" style={{ maxWidth: '280px' }}>
-                          {pkg.shortDescription}
-                        </div>
-                      </td>
+                      <td className="px-3 fw-semibold">{pkg.title}</td>
                       <td className="text-capitalize small">{pkg.category}</td>
-                      <td className="small fw-semibold text-dark">
+                      <td className="small">
                         {pkg.price != null
                           ? `₹${pkg.price.toLocaleString('en-IN')}`
                           : '—'}
                       </td>
-                      <td className="small text-secondary">{pkg.capacity ? `${pkg.capacity} guests` : '—'}</td>
+                      <td className="small">{pkg.capacity ?? '—'}</td>
                       <td>
                         {pkg.isFeatured ? (
-                          <span
-                            className="badge badge-neutral"
-                            style={{
-                              color: 'var(--brand-primary)',
-                              borderColor: 'var(--border-medium)',
-                            }}
-                          >
-                            Featured
+                          <span className="badge" style={{ background: '#f5a623', color: '#0d1b2a' }}>
+                            ⭐ Featured
                           </span>
                         ) : (
                           <span className="text-muted small">—</span>
@@ -150,32 +123,31 @@ const ManagePackages = () => {
                       </td>
                       <td>
                         {pkg.isActive !== false ? (
-                          <span className="badge status-confirmed">Active</span>
+                          <span className="badge bg-success">Active</span>
                         ) : (
-                          <span className="badge badge-neutral">Inactive</span>
+                          <span className="badge bg-secondary">Inactive</span>
                         )}
                       </td>
-                      <td className="text-end px-4">
-                        <div className="d-inline-flex gap-2">
+                      <td>
+                        <div className="d-flex gap-2">
                           <Link
                             to={`/admin/packages/${pkg._id}/edit`}
-                            className="btn btn-sm btn-outline-secondary btn-tactile"
+                            className="btn btn-sm"
+                            style={{
+                              background: '#e8f0fe',
+                              color: '#0d1b2a',
+                              fontSize: '0.78rem',
+                            }}
                           >
-                            <i className="bi bi-pencil me-1" aria-hidden="true" />
-                            Edit
+                            ✏️ Edit
                           </Link>
                           <button
-                            type="button"
-                            className="btn btn-sm btn-outline-danger btn-tactile"
+                            className="btn btn-sm btn-danger"
+                            style={{ fontSize: '0.78rem' }}
                             disabled={deletingId === pkg._id}
                             onClick={() => handleDelete(pkg._id, pkg.title)}
                           >
-                            {deletingId === pkg._id ? '…' : (
-                              <>
-                                <i className="bi bi-trash3 me-1" aria-hidden="true" />
-                                Delete
-                              </>
-                            )}
+                            {deletingId === pkg._id ? '…' : '🗑 Delete'}
                           </button>
                         </div>
                       </td>
@@ -185,10 +157,10 @@ const ManagePackages = () => {
               </table>
             </div>
             <div
-              className="p-3 px-4 border-top small text-muted text-end"
-              style={{ backgroundColor: 'var(--bg-surface)' }}
+              className="card-footer border-0 small text-muted text-end"
+              style={{ background: '#f8f9fa' }}
             >
-              {packages.length} package{packages.length !== 1 ? 's' : ''} listed
+              {packages.length} package{packages.length !== 1 ? 's' : ''} total
             </div>
           </div>
         )}

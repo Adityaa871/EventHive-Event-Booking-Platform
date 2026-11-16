@@ -4,7 +4,6 @@ import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import PackageFilters from '../components/packages/PackageFilters';
 import PackageGrid from '../components/packages/PackageGrid';
-import Pagination from '../components/common/Pagination';
 
 const ITEMS_PER_PAGE = 9;
 const SEARCH_DEBOUNCE_MS = 300;
@@ -15,12 +14,12 @@ export default function Packages() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [search, setSearch] = useState('');             // raw input value
+  const [debouncedSearch, setDebouncedSearch] = useState(''); // value sent to API
   const [category, setCategory] = useState('');
   const [reloadKey, setReloadKey] = useState(0);
 
-  // Debounce search
+  // Debounce the search input; resetting to page 1 happens in the same batch
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search.trim());
@@ -29,7 +28,7 @@ export default function Packages() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Fetch packages
+  // Single source of truth for fetching
   useEffect(() => {
     let ignore = false;
 
@@ -63,7 +62,7 @@ export default function Packages() {
 
     load();
     return () => {
-      ignore = true;
+      ignore = true; // discard responses from superseded requests
     };
   }, [page, debouncedSearch, category, reloadKey]);
 
@@ -86,34 +85,52 @@ export default function Packages() {
   };
 
   const handleRetry = () => setReloadKey((k) => k + 1);
+
+  const getPaginationRange = () => {
+    const range = [];
+    const delta = 2;
+    const left = Math.max(1, page - delta);
+    const right = Math.min(totalPages, page + delta);
+
+    if (left > 1) {
+      range.push(1);
+      if (left > 2) range.push('...');
+    }
+    for (let i = left; i <= right; i++) range.push(i);
+    if (right < totalPages) {
+      if (right < totalPages - 1) range.push('...');
+      range.push(totalPages);
+    }
+    return range;
+  };
+
   const hasFilters = Boolean(debouncedSearch || category);
 
   return (
-    <div className="reveal-fade-up">
-      {/* ── Page Header ── */}
+    <>
+      {/* Page Header */}
       <section
+        className="py-5 text-white text-center"
         style={{
-          backgroundColor: 'var(--bg-surface)',
-          borderBottom: '1px solid var(--border-subtle)',
-          paddingTop: '48px',
-          paddingBottom: '48px',
+          backgroundColor: '#0d1b6e',
+          minHeight: '260px',
+          display: 'flex',
+          alignItems: 'center',
         }}
       >
-        <div className="container">
-          <div className="d-inline-flex align-items-center gap-2 mb-2 text-muted small text-uppercase fw-semibold" style={{ letterSpacing: '0.06em' }}>
-            <span>Catalog</span>
-            <span>•</span>
-            <span>All packages</span>
-          </div>
-          <h1 className="h2 fw-bold mb-2">Event Packages</h1>
-          <p className="text-secondary mb-0" style={{ maxWidth: '560px' }}>
-            Transparent package inclusions designed for weddings, birthdays, corporate seminars, and special galas.
+        <div className="container py-3">
+          <span className="badge bg-white bg-opacity-15 text-white fw-normal mb-3 px-3 py-2">
+            All Packages
+          </span>
+          <h1 className="display-5 fw-bold mb-2">Event Packages</h1>
+          <p className="lead opacity-75 mb-0">
+            Discover the perfect package for your celebration
           </p>
         </div>
       </section>
 
-      {/* ── Main Content ── */}
-      <section className="py-5" style={{ minHeight: '600px' }}>
+      {/* Main Content */}
+      <section className="py-5 bg-light">
         <div className="container">
           <PackageFilters
             search={search}
@@ -122,57 +139,107 @@ export default function Packages() {
             onCategoryChange={handleCategoryChange}
           />
 
-          {/* Results Summary Bar */}
+          {/* Results summary */}
           {!loading && !error && (
-            <div className="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-              <div className="small text-muted">
-                {packages.length === 0 ? (
-                  'No packages found'
-                ) : (
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <p className="text-muted mb-0 small">
+                {packages.length === 0
+                  ? 'No packages found'
+                  : `Showing ${packages.length} package${packages.length !== 1 ? 's' : ''}`}
+                {debouncedSearch && (
                   <span>
-                    Showing <strong className="text-dark">{packages.length}</strong> package{packages.length !== 1 ? 's' : ''}
-                    {debouncedSearch && <span> matching <em>"{debouncedSearch}"</em></span>}
-                    {category && <span> in <strong className="text-dark text-capitalize">{category}</strong></span>}
+                    {' '}for <strong>"{debouncedSearch}"</strong>
                   </span>
                 )}
-              </div>
+                {category && (
+                  <span>
+                    {' '}in <strong>{category}</strong>
+                  </span>
+                )}
+              </p>
               {hasFilters && (
                 <button
-                  type="button"
-                  className="btn btn-outline-secondary btn-sm btn-tactile"
+                  className="btn btn-sm btn-outline-secondary rounded-pill"
                   onClick={handleClearFilters}
-                  style={{ fontSize: '12px', padding: '4px 10px' }}
                 >
-                  <i className="bi bi-x me-1" aria-hidden="true" />
-                  Reset filters
+                  <i className="bi bi-x me-1"></i>
+                  Clear Filters
                 </button>
               )}
             </div>
           )}
 
-          {/* Dynamic Content States */}
+          {/* Content states */}
           {loading ? (
-            <div className="py-5 text-center">
+            <div className="py-5">
               <Loader />
             </div>
           ) : error ? (
-            <ErrorMessage message={error} />
+            <ErrorMessage message={error} onRetry={handleRetry} />
+          ) : packages.length === 0 ? (
+            <div className="text-center py-5">
+              <i className="bi bi-search fs-1 text-muted d-block mb-3 opacity-40"></i>
+              <h5 className="text-muted fw-semibold">No packages found</h5>
+              <p className="text-muted small">
+                Try adjusting your search or filter criteria.
+              </p>
+            </div>
           ) : (
             <PackageGrid packages={packages} />
           )}
 
           {/* Pagination */}
           {!loading && !error && totalPages > 1 && (
-            <div className="mt-5 pt-3 d-flex justify-content-center">
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
-            </div>
+            <nav className="mt-5" aria-label="Package pagination">
+              <ul className="pagination justify-content-center flex-wrap gap-1">
+                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link rounded-pill px-3"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1}
+                    aria-label="Previous page"
+                  >
+                    <i className="bi bi-chevron-left"></i>
+                  </button>
+                </li>
+
+                {getPaginationRange().map((p, i) =>
+                  p === '...' ? (
+                    <li key={`ellipsis-${i}`} className="page-item disabled">
+                      <span className="page-link rounded-pill px-3">…</span>
+                    </li>
+                  ) : (
+                    <li key={p} className={`page-item ${p === page ? 'active' : ''}`}>
+                      <button
+                        className="page-link rounded-pill px-3"
+                        onClick={() => handlePageChange(p)}
+                        aria-current={p === page ? 'page' : undefined}
+                      >
+                        {p}
+                      </button>
+                    </li>
+                  )
+                )}
+
+                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link rounded-pill px-3"
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page === totalPages}
+                    aria-label="Next page"
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+
+              <p className="text-center text-muted small mt-2">
+                Page {page} of {totalPages}
+              </p>
+            </nav>
           )}
         </div>
       </section>
-    </div>
+    </>
   );
 }

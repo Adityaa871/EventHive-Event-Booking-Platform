@@ -27,11 +27,22 @@ export default function PackageDetails() {
 
   useEffect(() => {
     if (id) fetchPackage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  const categoryColors = {
+    birthday: 'primary',
+    wedding: 'danger',
+    corporate: 'dark',
+    anniversary: 'success',
+    other: 'secondary',
+  };
+
+  const badgeColor = pkg ? (categoryColors[pkg.category?.toLowerCase()] || 'primary') : 'primary';
 
   if (loading) {
     return (
-      <div className="container py-5 text-center">
+      <div className="container py-5">
         <Loader />
       </div>
     );
@@ -39,12 +50,12 @@ export default function PackageDetails() {
 
   if (error) {
     return (
-      <div className="container py-5" style={{ maxWidth: '600px' }}>
-        <ErrorMessage message={error} />
+      <div className="container py-5">
+        <ErrorMessage message={error} onRetry={fetchPackage} />
         <div className="text-center mt-3">
-          <Link to="/packages" className="btn btn-outline-primary btn-sm btn-tactile">
-            <i className="bi bi-arrow-left me-2" aria-hidden="true" />
-            Back to packages
+          <Link to="/packages" className="btn btn-outline-primary rounded-pill">
+            <i className="bi bi-arrow-left me-2"></i>
+            Back to Packages
           </Link>
         </div>
       </div>
@@ -54,28 +65,19 @@ export default function PackageDetails() {
   if (!pkg) return null;
 
   const images = pkg.images?.filter(Boolean) || [];
-  const categoryLabel = pkg.category
-    ? pkg.category.charAt(0).toUpperCase() + pkg.category.slice(1)
-    : 'Package';
 
   return (
-    <div className="reveal-fade-up">
-      {/* ── Breadcrumb Bar ── */}
-      <div
-        style={{
-          backgroundColor: 'var(--bg-surface)',
-          borderBottom: '1px solid var(--border-subtle)',
-          padding: '14px 0',
-        }}
-      >
+    <>
+      {/* Breadcrumb */}
+      <div className="bg-light border-bottom py-3">
         <div className="container">
           <nav aria-label="breadcrumb">
-            <ol className="breadcrumb mb-0">
+            <ol className="breadcrumb mb-0 small">
               <li className="breadcrumb-item">
-                <Link to="/">Home</Link>
+                <Link to="/" className="text-decoration-none">Home</Link>
               </li>
               <li className="breadcrumb-item">
-                <Link to="/packages">Packages</Link>
+                <Link to="/packages" className="text-decoration-none">Packages</Link>
               </li>
               <li className="breadcrumb-item active" aria-current="page">
                 {pkg.title || pkg.name}
@@ -85,83 +87,48 @@ export default function PackageDetails() {
         </div>
       </div>
 
-      {/* ── Main Detail Content ── */}
+      {/* Main Content */}
       <section className="py-5">
         <div className="container">
           <div className="row g-5">
-            {/* Left: Gallery */}
+            {/* ── Image Gallery ── */}
             <div className="col-lg-6">
               {images.length > 0 ? (
                 <>
+                  {/* Main Image */}
                   <div
-                    className="position-relative overflow-hidden mb-3"
-                    style={{
-                      height: '420px',
-                      backgroundColor: 'var(--bg-surface-subtle)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: 'var(--radius-md)',
-                    }}
+                    className="rounded-4 overflow-hidden shadow mb-3 position-relative"
+                    style={{ height: '420px' }}
                   >
                     <img
                       src={images[activeImage]}
-                      alt={`${pkg.title || pkg.name} preview`}
+                      alt={`${pkg.title || pkg.name} — image ${activeImage + 1}`}
                       className="w-100 h-100"
                       style={{ objectFit: 'cover' }}
                       onError={(e) => {
                         e.target.style.display = 'none';
                       }}
                     />
-
                     {images.length > 1 && (
                       <>
                         <button
-                          type="button"
-                          className="btn btn-tactile position-absolute top-50 start-0 translate-middle-y ms-3"
-                          style={{
-                            width: '36px',
-                            height: '36px',
-                            padding: 0,
-                            borderRadius: '50%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            border: '1px solid var(--border-subtle)',
-                            color: 'var(--text-primary)',
-                          }}
-                          onClick={() =>
-                            setActiveImage((prev) => (prev - 1 + images.length) % images.length)
-                          }
-                          aria-label="Previous photo"
+                          className="btn btn-light btn-sm position-absolute top-50 start-0 translate-middle-y ms-3 rounded-circle shadow"
+                          style={{ width: '40px', height: '40px' }}
+                          onClick={() => setActiveImage((prev) => (prev - 1 + images.length) % images.length)}
+                          aria-label="Previous image"
                         >
-                          <i className="bi bi-chevron-left" aria-hidden="true" />
+                          <i className="bi bi-chevron-left"></i>
                         </button>
                         <button
-                          type="button"
-                          className="btn btn-tactile position-absolute top-50 end-0 translate-middle-y me-3"
-                          style={{
-                            width: '36px',
-                            height: '36px',
-                            padding: 0,
-                            borderRadius: '50%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            border: '1px solid var(--border-subtle)',
-                            color: 'var(--text-primary)',
-                          }}
-                          onClick={() =>
-                            setActiveImage((prev) => (prev + 1) % images.length)
-                          }
-                          aria-label="Next photo"
+                          className="btn btn-light btn-sm position-absolute top-50 end-0 translate-middle-y me-3 rounded-circle shadow"
+                          style={{ width: '40px', height: '40px' }}
+                          onClick={() => setActiveImage((prev) => (prev + 1) % images.length)}
+                          aria-label="Next image"
                         >
-                          <i className="bi bi-chevron-right" aria-hidden="true" />
+                          <i className="bi bi-chevron-right"></i>
                         </button>
                         <div className="position-absolute bottom-0 end-0 m-3">
-                          <span
-                            className="badge"
-                            style={{
-                              backgroundColor: 'rgba(24, 24, 27, 0.85)',
-                              color: '#ffffff',
-                              fontSize: '11px',
-                              letterSpacing: '0.04em',
-                            }}
-                          >
+                          <span className="badge bg-dark bg-opacity-60 px-2 py-1">
                             {activeImage + 1} / {images.length}
                           </span>
                         </div>
@@ -169,25 +136,24 @@ export default function PackageDetails() {
                     )}
                   </div>
 
-                  {/* Thumbnail Row */}
+                  {/* Thumbnails */}
                   {images.length > 1 && (
                     <div className="d-flex gap-2 overflow-auto pb-1">
                       {images.map((img, idx) => (
                         <button
                           key={idx}
-                          type="button"
                           onClick={() => setActiveImage(idx)}
-                          className="p-0 border-0 flex-shrink-0"
+                          className={`p-0 border-0 rounded-3 overflow-hidden flex-shrink-0 ${
+                            activeImage === idx ? 'ring-active' : 'opacity-60'
+                          }`}
                           style={{
-                            width: '74px',
-                            height: '56px',
-                            borderRadius: 'var(--radius-sm)',
-                            overflow: 'hidden',
-                            outline: activeImage === idx ? '2px solid var(--brand-primary)' : '1px solid var(--border-subtle)',
-                            opacity: activeImage === idx ? 1 : 0.65,
-                            transition: 'all 0.15s ease',
+                            width: '80px',
+                            height: '60px',
+                            outline: activeImage === idx ? '3px solid #0d6efd' : 'none',
+                            outlineOffset: '2px',
+                            transition: 'opacity 0.2s',
                           }}
-                          aria-label={`View photo ${idx + 1}`}
+                          aria-label={`View image ${idx + 1}`}
                         >
                           <img
                             src={img}
@@ -201,75 +167,64 @@ export default function PackageDetails() {
                   )}
                 </>
               ) : (
+                /* Fallback */
                 <div
-                  className="d-flex flex-column align-items-center justify-content-center text-muted"
+                  className="rounded-4 d-flex align-items-center justify-content-center shadow"
                   style={{
                     height: '420px',
-                    backgroundColor: 'var(--bg-surface)',
-                    border: '1px dashed var(--border-medium)',
-                    borderRadius: 'var(--radius-md)',
+                    background: 'linear-gradient(135deg, #e8f4fd 0%, #f3e8ff 100%)',
                   }}
                 >
-                  <i className="bi bi-image fs-1 mb-2 text-secondary" aria-hidden="true" />
-                  <p className="small mb-0">No photos uploaded for this package</p>
+                  <div className="text-center text-muted">
+                    <i className="bi bi-image fs-1 d-block mb-3 opacity-40"></i>
+                    <p className="small">No images available</p>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Right: Package Info & Action */}
+            {/* ── Package Info ── */}
             <div className="col-lg-6">
-              <div className="d-flex align-items-center gap-2 mb-2">
-                <span className="badge badge-neutral text-uppercase" style={{ letterSpacing: '0.04em' }}>
-                  {categoryLabel}
+              {/* Category */}
+              {pkg.category && (
+                <span className={`badge bg-${badgeColor} text-capitalize mb-3 px-3 py-2`}>
+                  <i className="bi bi-tag me-1"></i>
+                  {pkg.category}
                 </span>
-                {pkg.isFeatured && (
-                  <span className="badge" style={{ backgroundColor: 'var(--brand-primary)', color: '#ffffff' }}>
-                    Featured
+              )}
+
+              <h1 className="display-6 fw-bold mb-3">{pkg.title || pkg.name}</h1>
+
+              {/* Price */}
+              {pkg.price && (
+                <div className="mb-4">
+                  <span className="display-6 fw-black text-primary">
+                    ₹{pkg.price.toLocaleString('en-IN')}
                   </span>
-                )}
-              </div>
-
-              <h1 className="h2 fw-bold mb-3" style={{ letterSpacing: '-0.03em' }}>
-                {pkg.title || pkg.name}
-              </h1>
-
-              {/* Price Block */}
-              <div className="mb-4 pb-3 border-bottom">
-                <div className="text-muted small text-uppercase fw-semibold" style={{ letterSpacing: '0.04em' }}>
-                  Base package price
+                  <span className="text-muted ms-2">onwards</span>
                 </div>
-                <div className="d-flex align-items-baseline gap-2">
-                  <span className="display-6 fw-bold text-dark" style={{ letterSpacing: '-0.03em' }}>
-                    ₹{Number(pkg.price || 0).toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-muted small">inclusive of initial consultation & planning</span>
-                </div>
-              </div>
+              )}
 
-              {/* Quick Specs */}
+              {/* Quick Stats */}
               <div className="row g-3 mb-4">
                 {pkg.capacity && (
-                  <div className="col-sm-6">
-                    <div
-                      className="p-3 card-tactile"
-                      style={{ backgroundColor: 'var(--bg-surface)' }}
-                    >
-                      <div className="text-muted small">Guest capacity</div>
-                      <div className="fw-bold mt-1" style={{ color: 'var(--text-primary)' }}>
-                        Up to {pkg.capacity} attendees
+                  <div className="col-auto">
+                    <div className="d-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-light border">
+                      <i className="bi bi-people-fill text-primary"></i>
+                      <div>
+                        <div className="small text-muted">Capacity</div>
+                        <div className="fw-semibold small">{pkg.capacity} guests</div>
                       </div>
                     </div>
                   </div>
                 )}
                 {pkg.duration && (
-                  <div className="col-sm-6">
-                    <div
-                      className="p-3 card-tactile"
-                      style={{ backgroundColor: 'var(--bg-surface)' }}
-                    >
-                      <div className="text-muted small">Event duration</div>
-                      <div className="fw-bold mt-1" style={{ color: 'var(--text-primary)' }}>
-                        {pkg.duration}
+                  <div className="col-auto">
+                    <div className="d-flex align-items-center gap-2 px-3 py-2 rounded-3 bg-light border">
+                      <i className="bi bi-clock-fill text-success"></i>
+                      <div>
+                        <div className="small text-muted">Duration</div>
+                        <div className="fw-semibold small">{pkg.duration}</div>
                       </div>
                     </div>
                   </div>
@@ -279,60 +234,64 @@ export default function PackageDetails() {
               {/* Description */}
               {pkg.description && (
                 <div className="mb-4">
-                  <h6 className="fw-bold text-uppercase text-muted small mb-2" style={{ letterSpacing: '0.05em' }}>
-                    Overview
-                  </h6>
-                  <p className="text-secondary" style={{ lineHeight: 1.7 }}>
-                    {pkg.description}
-                  </p>
+                  <h5 className="fw-bold mb-2">About This Package</h5>
+                  <p className="text-muted lh-relaxed">{pkg.description}</p>
                 </div>
               )}
 
               {/* Inclusions */}
               {pkg.inclusions?.length > 0 && (
-                <div className="mb-4 pb-3 border-bottom">
-                  <h6 className="fw-bold text-uppercase text-muted small mb-3" style={{ letterSpacing: '0.05em' }}>
-                    What is included
-                  </h6>
-                  <div className="row g-2">
+                <div className="mb-4">
+                  <h5 className="fw-bold mb-3">
+                    <i className="bi bi-check-circle-fill text-success me-2"></i>
+                    What's Included
+                  </h5>
+                  <div className="d-flex flex-wrap gap-2">
                     {pkg.inclusions.map((item, i) => (
-                      <div key={i} className="col-sm-6">
-                        <div className="d-flex align-items-start gap-2 small text-secondary">
-                          <i className="bi bi-check2 text-dark fw-bold" aria-hidden="true" />
-                          <span>{item}</span>
-                        </div>
-                      </div>
+                      <span key={i} className="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                        <i className="bi bi-check2 me-1"></i>
+                        {item}
+                      </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Action Buttons */}
-              <div className="d-flex gap-3 flex-wrap pt-2">
+              {/* CTA */}
+              <div className="d-flex gap-3 flex-wrap mt-4 pt-2 border-top">
                 <Link
                   to="/book"
                   state={{ packageId: pkg._id }}
-                  className="btn btn-primary btn-tactile btn-lg flex-grow-1"
+                  className="btn btn-primary btn-lg px-5 rounded-pill fw-bold flex-grow-1"
                 >
-                  Book this package
-                  <i className="bi bi-arrow-right ms-2 icon-nudge" aria-hidden="true" />
+                  <i className="bi bi-calendar-check me-2"></i>
+                  Book This Package
                 </Link>
                 <Link
                   to="/contact"
-                  className="btn btn-outline-secondary btn-tactile btn-lg"
+                  className="btn btn-outline-secondary btn-lg rounded-pill"
                 >
-                  Ask a question
+                  <i className="bi bi-chat me-1"></i>
+                  Enquire
                 </Link>
               </div>
 
-              <div className="d-flex align-items-center gap-2 mt-3 text-muted small">
-                <i className="bi bi-shield-check text-dark" aria-hidden="true" />
-                <span>Custom date blocking • Zero obligation estimate</span>
-              </div>
+              <p className="text-muted small mt-3">
+                <i className="bi bi-shield-check text-success me-1"></i>
+                Free consultation • No hidden charges • 100% satisfaction
+              </p>
             </div>
+          </div>
+
+          {/* Back link */}
+          <div className="mt-5 pt-3 border-top">
+            <Link to="/packages" className="btn btn-outline-secondary rounded-pill">
+              <i className="bi bi-arrow-left me-2"></i>
+              Back to All Packages
+            </Link>
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 }

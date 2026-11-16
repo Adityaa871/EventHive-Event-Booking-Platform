@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import Loader from '../../components/common/Loader';
@@ -7,44 +7,29 @@ import { getBookingStats, getBookings } from '../../services/bookingService';
 import { useAuth } from '../../context/AuthContext';
 
 // ─── StatCard ────────────────────────────────────────────────────────────────
-const StatCard = ({ title, value, icon, helper }) => (
+const StatCard = ({ title, value, icon, color }) => (
   <div className="col-12 col-sm-6 col-xl-3">
-    <div
-      className="p-4 card-tactile h-100"
-      style={{
-        backgroundColor: 'var(--bg-surface)',
-        border: '1px solid var(--border-subtle)',
-      }}
-    >
-      <div className="d-flex align-items-center justify-content-between mb-2">
-        <span
-          className="text-uppercase small fw-bold text-muted"
-          style={{ letterSpacing: '0.05em', fontSize: '11px' }}
-        >
-          {title}
-        </span>
-        <i className={`bi ${icon} text-muted`} aria-hidden="true" />
+    <div className={`card border-0 text-white ${color} shadow-sm h-100`}>
+      <div className="card-body d-flex align-items-center gap-3">
+        <div style={{ fontSize: '2.4rem', lineHeight: 1 }}>{icon}</div>
+        <div>
+          <div className="fs-2 fw-bold lh-1">{value ?? '—'}</div>
+          <div className="small opacity-75 mt-1">{title}</div>
+        </div>
       </div>
-      <div
-        className="display-6 fw-bold text-dark mb-1"
-        style={{ letterSpacing: '-0.03em', lineHeight: 1.1 }}
-      >
-        {value ?? '—'}
-      </div>
-      <div className="small text-muted">{helper}</div>
     </div>
   </div>
 );
 
 // ─── Status badge helper ──────────────────────────────────────────────────────
-const statusClass = (status) => {
+const statusVariant = (status) => {
   const map = {
-    new: 'status-new',
-    contacted: 'status-contacted',
-    confirmed: 'status-confirmed',
-    cancelled: 'status-cancelled',
+    new: 'primary',
+    contacted: 'info',
+    confirmed: 'success',
+    cancelled: 'danger',
   };
-  return map[status] || 'badge-neutral';
+  return map[status] || 'secondary';
 };
 
 // ─── AdminDashboard ───────────────────────────────────────────────────────────
@@ -89,95 +74,86 @@ const AdminDashboard = () => {
 
   const statCards = [
     {
-      title: 'Total Inquiries',
+      title: 'Total Leads',
       value: stats?.total,
-      icon: 'bi-inbox',
-      helper: 'All recorded leads',
+      icon: '📁',
+      color: 'bg-primary',
     },
     {
-      title: 'Action Required',
+      title: 'New Leads',
       value: stats?.new,
-      icon: 'bi-bell',
-      helper: 'Awaiting phone follow-up',
+      icon: '🆕',
+      color: 'bg-info',
     },
     {
-      title: 'Confirmed Events',
+      title: 'Confirmed',
       value: stats?.confirmed,
-      icon: 'bi-check2-circle',
-      helper: 'Deposit & contract signed',
+      icon: '✅',
+      color: 'bg-success',
     },
     {
-      title: 'Closed / Cancelled',
+      title: 'Cancelled',
       value: stats?.cancelled,
-      icon: 'bi-x-circle',
-      helper: 'Passed or unavailable',
+      icon: '❌',
+      color: 'bg-danger',
     },
   ];
 
   return (
-    <div className="d-flex admin-layout" style={{ minHeight: '100vh', backgroundColor: 'var(--bg-canvas)' }}>
+    <div className="d-flex" style={{ minHeight: '100vh', background: '#f0f4f8' }}>
       <AdminSidebar />
 
-      <main className="flex-grow-1 p-4 p-md-5 reveal-fade-up">
+      <main className="flex-grow-1 p-4">
         {/* Header */}
-        <div className="d-flex flex-column flex-sm-row sm-align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom">
-          <div>
-            <h1 className="h3 fw-bold mb-1">
-              Welcome back, {admin?.name || 'Administrator'}
-            </h1>
-            <p className="text-muted small mb-0">Overview of client inquiries, package catalog, and coordination metrics.</p>
-          </div>
-          <div className="d-flex gap-2">
-            <Link to="/admin/leads" className="btn btn-primary btn-tactile btn-sm">
-              <i className="bi bi-inbox me-2" aria-hidden="true" />
-              Manage leads
-            </Link>
-            <Link to="/admin/packages" className="btn btn-outline-secondary btn-tactile btn-sm">
-              <i className="bi bi-box-seam me-2" aria-hidden="true" />
-              Packages
-            </Link>
-          </div>
+        <div className="mb-4">
+          <h4 className="fw-bold mb-0" style={{ color: '#0d1b2a' }}>
+            👋 Welcome back, {admin?.name || 'Admin'}!
+          </h4>
+          <p className="text-muted small mb-0">Here's what's happening with EventHive today.</p>
         </div>
 
         {/* Stat Cards */}
         {loadingStats ? (
-          <div className="py-4 text-center">
-            <Loader />
-          </div>
+          <Loader />
         ) : statsError ? (
           <ErrorMessage message={statsError} />
         ) : (
-          <div className="row g-3 mb-5">
+          <div className="row g-3 mb-4">
             {statCards.map((card) => (
               <StatCard key={card.title} {...card} />
             ))}
           </div>
         )}
 
-        {/* Recent Bookings Table */}
-        <div
-          className="card-tactile overflow-hidden"
-          style={{
-            backgroundColor: 'var(--bg-surface)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-md)',
-          }}
-        >
-          <div
-            className="p-3 px-4 d-flex align-items-center justify-content-between border-bottom"
-            style={{ backgroundColor: 'var(--bg-surface)' }}
+        {/* Quick Links */}
+        <div className="d-flex gap-2 mb-4 flex-wrap">
+          <Link
+            to="/admin/leads"
+            className="btn btn-sm fw-semibold"
+            style={{ background: '#0d1b2a', color: '#f5a623', border: 'none' }}
           >
-            <span className="fw-bold text-dark small text-uppercase" style={{ letterSpacing: '0.04em' }}>
-              Recent Client Inquiries
-            </span>
-            <Link to="/admin/leads" className="small text-secondary fw-semibold">
-              View all ({stats?.total || recentBookings.length}) →
-            </Link>
-          </div>
+            📋 Manage Leads
+          </Link>
+          <Link
+            to="/admin/packages"
+            className="btn btn-sm fw-semibold"
+            style={{ background: '#f5a623', color: '#0d1b2a', border: 'none' }}
+          >
+            📦 Manage Packages
+          </Link>
+        </div>
 
-          <div className="p-0">
+        {/* Recent Bookings Table */}
+        <div className="card border-0 shadow-sm">
+          <div
+            className="card-header border-0 fw-semibold"
+            style={{ background: '#0d1b2a', color: '#f5a623' }}
+          >
+            🕐 5 Most Recent Bookings
+          </div>
+          <div className="card-body p-0">
             {loadingBookings ? (
-              <div className="p-5 text-center">
+              <div className="p-4">
                 <Loader />
               </div>
             ) : bookingsError ? (
@@ -185,27 +161,27 @@ const AdminDashboard = () => {
                 <ErrorMessage message={bookingsError} />
               </div>
             ) : recentBookings.length === 0 ? (
-              <div className="p-5 text-center text-muted small">No inquiries recorded yet.</div>
+              <div className="p-4 text-center text-muted">No bookings found.</div>
             ) : (
               <div className="table-responsive">
-                <table className="table align-middle">
-                  <thead>
+                <table className="table table-hover mb-0 align-middle">
+                  <thead style={{ background: '#f8f9fa' }}>
                     <tr>
-                      <th className="px-4">Client Name</th>
+                      <th className="px-3">Name</th>
                       <th>Email</th>
-                      <th>Occasion</th>
-                      <th>Target Date</th>
-                      <th>Package Ref</th>
+                      <th>Event Type</th>
+                      <th>Event Date</th>
+                      <th>Package</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentBookings.map((b) => (
                       <tr key={b._id}>
-                        <td className="px-4 fw-semibold text-dark">{b.name}</td>
-                        <td className="text-secondary small">{b.email}</td>
-                        <td className="text-capitalize small">{b.eventType || '—'}</td>
-                        <td className="small text-secondary">
+                        <td className="px-3 fw-medium">{b.name}</td>
+                        <td className="text-muted small">{b.email}</td>
+                        <td>{b.eventType || '—'}</td>
+                        <td>
                           {b.eventDate
                             ? new Date(b.eventDate).toLocaleDateString('en-IN', {
                                 day: '2-digit',
@@ -214,9 +190,9 @@ const AdminDashboard = () => {
                               })
                             : '—'}
                         </td>
-                        <td className="small">{b.package?.title || b.packageName || 'Custom Inquiry'}</td>
+                        <td>{b.package?.title || b.packageName || '—'}</td>
                         <td>
-                          <span className={`badge ${statusClass(b.status)} text-capitalize`}>
+                          <span className={`badge bg-${statusVariant(b.status)} text-capitalize`}>
                             {b.status}
                           </span>
                         </td>
@@ -226,6 +202,15 @@ const AdminDashboard = () => {
                 </table>
               </div>
             )}
+          </div>
+          <div className="card-footer bg-transparent border-0 text-end">
+            <Link
+              to="/admin/leads"
+              className="btn btn-sm"
+              style={{ color: '#0d1b2a', fontWeight: 600 }}
+            >
+              View All Leads →
+            </Link>
           </div>
         </div>
       </main>
