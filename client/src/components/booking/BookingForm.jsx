@@ -26,7 +26,7 @@ const getTodayString = () => {
   const today = new Date();
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0'); // Fixed: use current day
   return `${yyyy}-${mm}-${dd}`;
 };
 
@@ -55,7 +55,7 @@ const validate = (form) => {
     const selected = new Date(form.eventDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (selected <= today) errors.eventDate = 'Event date must be in the future.';
+    if (selected < today) errors.eventDate = 'Event date cannot be in the past.';
   }
 
   if (!form.guestCount) {
@@ -66,6 +66,22 @@ const validate = (form) => {
 
   return errors;
 };
+
+// Moved Field outside BookingForm to prevent re-creation and loss of input focus
+const Field = ({ label, name, required, children, hint, error }) => (
+  <div className="mb-3">
+    <label htmlFor={name} className="form-label d-block">
+      {label} {required && <span className="text-danger">*</span>}
+    </label>
+    {children}
+    {hint && !error && <div className="form-text">{hint}</div>}
+    {error && (
+      <div className="invalid-feedback d-block mt-1" style={{ fontSize: '12px' }}>
+        {error}
+      </div>
+    )}
+  </div>
+);
 
 export default function BookingForm({ packages = [], selectedPackageId = '', onSuccess }) {
   const [form, setForm] = useState({ ...initialForm, package: selectedPackageId || '' });
@@ -127,21 +143,6 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
     }
   };
 
-  const Field = ({ label, name, required, children, hint }) => (
-    <div className="mb-3">
-      <label htmlFor={name} className="form-label d-block">
-        {label} {required && <span className="text-danger">*</span>}
-      </label>
-      {children}
-      {hint && !errors[name] && <div className="form-text">{hint}</div>}
-      {errors[name] && (
-        <div className="invalid-feedback d-block mt-1" style={{ fontSize: '12px' }}>
-          {errors[name]}
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <form onSubmit={handleSubmit} noValidate>
       {apiError && (
@@ -164,7 +165,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
       <div className="row g-3">
         {/* Full Name */}
         <div className="col-md-6">
-          <Field label="Full Name" name="name" required>
+          <Field label="Full Name" name="name" required error={errors.name}>
             <input
               type="text"
               id="name"
@@ -180,7 +181,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Email Address */}
         <div className="col-md-6">
-          <Field label="Email Address" name="email" required>
+          <Field label="Email Address" name="email" required error={errors.email}>
             <input
               type="email"
               id="email"
@@ -196,7 +197,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Phone Number */}
         <div className="col-md-6">
-          <Field label="Mobile Phone" name="phone" required hint="10-digit Indian mobile number">
+          <Field label="Mobile Phone" name="phone" required hint="10-digit Indian mobile number" error={errors.phone}>
             <input
               type="tel"
               id="phone"
@@ -213,7 +214,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Package Selector */}
         <div className="col-md-6">
-          <Field label="Package Selection" name="package">
+          <Field label="Package Selection" name="package" error={errors.package}>
             <select
               id="package"
               name="package"
@@ -233,7 +234,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Event Type */}
         <div className="col-md-6">
-          <Field label="Event Type" name="eventType" required>
+          <Field label="Event Type" name="eventType" required error={errors.eventType}>
             <select
               id="eventType"
               name="eventType"
@@ -253,7 +254,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Event Date */}
         <div className="col-md-6">
-          <Field label="Target Event Date" name="eventDate" required>
+          <Field label="Target Event Date" name="eventDate" required error={errors.eventDate}>
             <input
               type="date"
               id="eventDate"
@@ -268,7 +269,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Guest Count */}
         <div className="col-md-6">
-          <Field label="Estimated Attendees" name="guestCount" required>
+          <Field label="Estimated Attendees" name="guestCount" required error={errors.guestCount}>
             <input
               type="number"
               id="guestCount"
@@ -284,7 +285,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Venue / City */}
         <div className="col-md-6">
-          <Field label="Preferred Venue or Area" name="venue">
+          <Field label="Preferred Venue or Area" name="venue" error={errors.venue}>
             <input
               type="text"
               id="venue"
@@ -299,7 +300,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Budget */}
         <div className="col-md-6">
-          <Field label="Estimated Budget (₹ INR)" name="budget">
+          <Field label="Estimated Budget (₹ INR)" name="budget" error={errors.budget}>
             <input
               type="number"
               id="budget"
@@ -315,7 +316,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
 
         {/* Message */}
         <div className="col-12">
-          <Field label="Specific Requirements & Special Notes" name="message">
+          <Field label="Specific Requirements & Special Notes" name="message" error={errors.message}>
             <textarea
               id="message"
               name="message"
@@ -339,6 +340,7 @@ export default function BookingForm({ packages = [], selectedPackageId = '', onS
           {loading ? (
             <>
               <span
+                spinner-border="true"
                 className="spinner-border spinner-border-sm me-2"
                 role="status"
                 aria-hidden="true"

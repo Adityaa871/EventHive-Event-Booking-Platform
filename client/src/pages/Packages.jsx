@@ -110,56 +110,57 @@ export default function Packages() {
     <>
       {/* Page Header */}
       <section
-        className="py-5 text-white text-center"
-        style={{
-          backgroundColor: '#0d1b6e',
-          minHeight: '260px',
-          display: 'flex',
-          alignItems: 'center',
-        }}
+        className="py-5 bg-white text-dark text-center border-bottom d-flex align-items-center"
+        style={{ minHeight: '200px' }}
       >
-        <div className="container py-3">
-          <span className="badge bg-white bg-opacity-15 text-white fw-normal mb-3 px-3 py-2">
+        <div className="container">
+          <span className="badge rounded-pill bg-light text-secondary border fw-medium text-uppercase small px-3 py-2 mb-3">
             All Packages
           </span>
-          <h1 className="display-5 fw-bold mb-2">Event Packages</h1>
-          <p className="lead opacity-75 mb-0">
+          <h1 className="h2 fw-bold tracking-tight mb-2">Event Packages</h1>
+          <p
+            className="text-muted fs-6 mx-auto mb-0"
+            style={{ maxWidth: '520px' }}
+          >
             Discover the perfect package for your celebration
           </p>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="py-5 bg-light">
+      <section className="py-4 py-md-5 bg-light">
         <div className="container">
-          <PackageFilters
-            search={search}
-            category={category}
-            onSearchChange={setSearch}
-            onCategoryChange={handleCategoryChange}
-          />
+          <div className="mb-4">
+            <PackageFilters
+              search={search}
+              category={category}
+              onSearchChange={setSearch}
+              onCategoryChange={handleCategoryChange}
+            />
+          </div>
 
           {/* Results summary */}
           {!loading && !error && (
-            <div className="d-flex align-items-center justify-content-between mb-4">
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
               <p className="text-muted mb-0 small">
                 {packages.length === 0
                   ? 'No packages found'
                   : `Showing ${packages.length} package${packages.length !== 1 ? 's' : ''}`}
                 {debouncedSearch && (
                   <span>
-                    {' '}for <strong>"{debouncedSearch}"</strong>
+                    {' '}for <strong className="text-dark">"{debouncedSearch}"</strong>
                   </span>
                 )}
                 {category && (
                   <span>
-                    {' '}in <strong>{category}</strong>
+                    {' '}in <strong className="text-dark">{category}</strong>
                   </span>
                 )}
               </p>
               {hasFilters && (
                 <button
-                  className="btn btn-sm btn-outline-secondary rounded-pill"
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary rounded-pill d-inline-flex align-items-center px-3"
                   onClick={handleClearFilters}
                 >
                   <i className="bi bi-x me-1"></i>
@@ -171,16 +172,16 @@ export default function Packages() {
 
           {/* Content states */}
           {loading ? (
-            <div className="py-5">
+            <div className="py-5 d-flex justify-content-center">
               <Loader />
             </div>
           ) : error ? (
             <ErrorMessage message={error} onRetry={handleRetry} />
           ) : packages.length === 0 ? (
-            <div className="text-center py-5">
-              <i className="bi bi-search fs-1 text-muted d-block mb-3 opacity-40"></i>
-              <h5 className="text-muted fw-semibold">No packages found</h5>
-              <p className="text-muted small">
+            <div className="text-center py-5 my-2">
+              <i className="bi bi-search fs-2 text-muted d-block mb-2 opacity-50"></i>
+              <h2 className="h6 text-dark fw-semibold mb-1">No packages found</h2>
+              <p className="text-muted small mb-0">
                 Try adjusting your search or filter criteria.
               </p>
             </div>
@@ -191,10 +192,11 @@ export default function Packages() {
           {/* Pagination */}
           {!loading && !error && totalPages > 1 && (
             <nav className="mt-5" aria-label="Package pagination">
-              <ul className="pagination justify-content-center flex-wrap gap-1">
+              <ul className="pagination pagination-sm justify-content-center align-items-center flex-wrap gap-1 mb-2">
                 <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
                   <button
-                    className="page-link rounded-pill px-3"
+                    type="button"
+                    className="page-link rounded-pill px-3 d-inline-flex align-items-center"
                     onClick={() => handlePageChange(page - 1)}
                     disabled={page === 1}
                     aria-label="Previous page"
@@ -206,11 +208,14 @@ export default function Packages() {
                 {getPaginationRange().map((p, i) =>
                   p === '...' ? (
                     <li key={`ellipsis-${i}`} className="page-item disabled">
-                      <span className="page-link rounded-pill px-3">…</span>
+                      <span className="page-link border-0 bg-transparent text-muted px-2">
+                        …
+                      </span>
                     </li>
                   ) : (
                     <li key={p} className={`page-item ${p === page ? 'active' : ''}`}>
                       <button
+                        type="button"
                         className="page-link rounded-pill px-3"
                         onClick={() => handlePageChange(p)}
                         aria-current={p === page ? 'page' : undefined}
@@ -223,7 +228,8 @@ export default function Packages() {
 
                 <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
                   <button
-                    className="page-link rounded-pill px-3"
+                    type="button"
+                    className="page-link rounded-pill px-3 d-inline-flex align-items-center"
                     onClick={() => handlePageChange(page + 1)}
                     disabled={page === totalPages}
                     aria-label="Next page"
@@ -233,7 +239,7 @@ export default function Packages() {
                 </li>
               </ul>
 
-              <p className="text-center text-muted small mt-2">
+              <p className="text-center text-muted small mb-0">
                 Page {page} of {totalPages}
               </p>
             </nav>
@@ -242,4 +248,4 @@ export default function Packages() {
       </section>
     </>
   );
-}
+}   

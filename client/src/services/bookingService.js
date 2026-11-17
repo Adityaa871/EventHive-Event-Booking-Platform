@@ -19,6 +19,11 @@ export const getBookings = async (params = {}) => {
   };
 };
 
+export const getMyBookings = async () => {
+  const res = await api.get('/bookings/my-bookings');
+  return res.data?.data || res.data;
+};
+
 export const getBooking = async (id) => {
   const res = await api.get(`/bookings/${id}`);
   return res.data?.data || res.data;
@@ -27,6 +32,44 @@ export const getBooking = async (id) => {
 export const updateBooking = async (id, data) => {
   const res = await api.patch(`/bookings/${id}`, data);
   return res.data?.data || res.data;
+};
+
+export const updateBookingStatus = async (id, data) => {
+  const res = await api.patch(`/bookings/${id}/status`, data);
+  return res.data?.data || res.data;
+};
+
+export const requestCancellation = async (id, reason) => {
+  const res = await api.post(`/bookings/${id}/cancel-request`, { reason });
+  return res.data?.data || res.data;
+};
+
+export const requestReschedule = async (id, newDate, reason) => {
+  const res = await api.post(`/bookings/${id}/reschedule-request`, { newDate, reason });
+  return res.data?.data || res.data;
+};
+
+export const reviewCancellation = async (id, approved, adminResponse) => {
+  const res = await api.patch(`/bookings/${id}/cancellation-review`, { approved, adminResponse });
+  return res.data?.data || res.data;
+};
+
+export const reviewReschedule = async (id, approved, adminResponse) => {
+  const res = await api.patch(`/bookings/${id}/reschedule-review`, { approved, adminResponse });
+  return res.data?.data || res.data;
+};
+
+export const downloadInvoice = async (id, filename = 'EventHive-Invoice.pdf') => {
+  const res = await api.get(`/bookings/${id}/invoice`, { responseType: 'blob' });
+  const blob = new Blob([res.data], { type: 'application/pdf' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode.removeChild(link);
+  window.URL.revokeObjectURL(url);
 };
 
 export const deleteBooking = async (id) => {
