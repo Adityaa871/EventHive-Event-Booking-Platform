@@ -6,6 +6,11 @@ const morgan = require('morgan');
 const authRoutes = require('./routes/authRoutes');
 const packageRoutes = require('./routes/packageRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+const availabilityRoutes = require('./routes/availabilityRoutes');
+const couponRoutes = require('./routes/couponRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const notFound = require('./middleware/notFound');
 
@@ -28,7 +33,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Body parsing
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Health check
@@ -40,6 +45,11 @@ app.get('/api/v1/health', (req, res) => {
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/packages', packageRoutes);
 app.use('/api/v1/bookings', bookingRoutes);
+app.use('/api/v1/availability', availabilityRoutes);
+app.use('/api/v1/coupons', couponRoutes);
+app.use('/api/v1/wishlist', wishlistRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
+app.use('/api/v1/ai', aiRoutes);
 
 // 404 handler
 app.use(notFound);
@@ -48,4 +58,3 @@ app.use(notFound);
 app.use(errorHandler);
 
 module.exports = app;
-
