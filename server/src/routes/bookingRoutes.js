@@ -2,13 +2,20 @@ const { Router } = require('express');
 const { body } = require('express-validator');
 const {
   createBooking,
+  getMyBookings,
+  requestCancellation,
+  requestReschedule,
+  updateBookingStatus,
+  reviewCancellation,
+  reviewReschedule,
+  downloadInvoice,
   getBookings,
   getBooking,
   updateBooking,
   deleteBooking,
   getBookingStats,
 } = require('../controllers/bookingController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, adminOnly, optionalAuth } = require('../middleware/authMiddleware');
 const validate = require('../middleware/validate');
 const rateLimit = require('express-rate-limit');
 
@@ -16,8 +23,8 @@ const router = Router();
 
 // Rate limit public booking submissions
 const bookingLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
+  windowMs: 60 * 60 * 1000,
+  max: 20,
   message: { success: false, message: 'Too many booking requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -42,17 +49,42 @@ const bookingValidation = [
   body('guestCount').isInt({ min: 1 }).withMessage('Guest count must be at least 1'),
 ];
 
-// IMPORTANT: stats route must be defined before /:id to avoid conflict
-router.get('/stats/summary', protect, getBookingStats);
+// 1. Analytics route (must be before /:id)
+router.get('/stats/summary', protect, adminOnly, getBookingStats);
 
-// Public
-router.post('/', bookingLimiter, bookingValidation, validate, createBooking);
+// 2. Customer user bookings
+router.get('/my-bookings', protect, getMyBookings);
 
-// Admin
-router.get('/', protect, getBookings);
+// 3. Public creation with optional logged-in user link
+router.post('/', bookingLimiter, optionalAuth, bookingValidation, validate, createBooking);
+
+// 4. Booking specific operations
+router.get('/:id/invoice', protect, downloadInvoice);
+router.post(
+  '/:id/cancel-request',
+  protect,
+  [body('reason').notEmpty().trim().withMessage('Cancellation reason is required')],
+  validate,
+  requestCancellation
+);
+router.post(
+  '/:id/reschedule-request',
+  protect,
+  [
+    body('newDate').isISO8601().withMessage('Valid new event date required'),
+    body('reason').optional().trim(),
+  ],
+  validate,
+  requestReschedule
+);
+
+// 5. Admin management routes
+router.get('/', protect, adminOnly, getBookings);
 router.get('/:id', protect, getBooking);
-router.patch('/:id', protect, updateBooking);
-router.delete('/:id', protect, deleteBooking);
+router.patch('/:id', protect, adminOnly, updateBooking);
+router.patch('/:id/status', protect, adminOnly, updateBookingStatus);
+router.patch('/:id/cancellation-review', protect, adminOnly, reviewCancellation);
+router.patch('/:id/reschedule-review', protect, adminOnly, reviewReschedule);
+router.delete('/:id', protect, adminOnly, deleteBooking);
 
 module.exports = router;
-

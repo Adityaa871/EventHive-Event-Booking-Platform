@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Package = require('../models/Package');
 const Admin = require('../models/Admin');
+const User = require('../models/User');
+const Coupon = require('../models/Coupon');
+const Booking = require('../models/Booking');
+const Review = require('../models/Review');
 
 const packages = [
   // ── Birthday ──────────────────────────────────────────────
@@ -184,19 +188,118 @@ const seedDB = async () => {
     // Clear existing data
     await Package.deleteMany({});
     await Admin.deleteMany({});
-    console.log('Cleared existing packages and admins.');
+    await User.deleteMany({});
+    await Coupon.deleteMany({});
+    console.log('Cleared existing collections.');
 
-    // Create admin
+    // Create legacy admin
     const admin = await Admin.create({
       name: process.env.ADMIN_NAME || 'EventHive Admin',
       email: process.env.ADMIN_EMAIL || 'admin@eventhive.com',
       password: process.env.ADMIN_PASSWORD || 'Admin@12345',
     });
-    console.log(`Admin created: ${admin.email}`);
+
+    // Create admin user in User collection
+    await User.create({
+      name: process.env.ADMIN_NAME || 'EventHive Admin',
+      email: process.env.ADMIN_EMAIL || 'admin@eventhive.com',
+      phone: '9876543210',
+      password: process.env.ADMIN_PASSWORD || 'Admin@12345',
+      role: 'admin',
+    });
+
+    // Create customer demo user
+    const demoUser = await User.create({
+      name: 'Priya Sharma',
+      email: 'demo@eventhive.com',
+      phone: '9812345678',
+      password: 'User@12345',
+      role: 'user',
+    });
+    console.log(`Users seeded (Admin: admin@eventhive.com, Customer: ${demoUser.email})`);
 
     // Insert packages
     const inserted = await Package.insertMany(packages);
     console.log(`${inserted.length} packages inserted.`);
+
+    // Seed starter coupons
+    const oneYearLater = new Date();
+    oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+
+    await Coupon.insertMany([
+      {
+        code: 'WELCOME10',
+        discountType: 'percentage',
+        discountValue: 10,
+        minBookingAmount: 20000,
+        maxDiscountAmount: 10000,
+        expiryDate: oneYearLater,
+        usageLimit: 100,
+        description: '10% discount for first-time event bookings up to Rs. 10,000.',
+        isActive: true,
+      },
+      {
+        code: 'FESTIVE5000',
+        discountType: 'fixed',
+        discountValue: 5000,
+        minBookingAmount: 50000,
+        expiryDate: oneYearLater,
+        usageLimit: 50,
+        description: 'Flat Rs. 5,000 off on grand occasion celebrations above Rs. 50,000.',
+        isActive: true,
+      },
+      {
+        code: 'ROYAL20',
+        discountType: 'percentage',
+        discountValue: 20,
+        minBookingAmount: 150000,
+        maxDiscountAmount: 50000,
+        expiryDate: oneYearLater,
+        usageLimit: 25,
+        description: 'Exclusive 20% discount on luxury royal packages up to Rs. 50,000.',
+        isActive: true,
+      },
+    ]);
+    console.log('Seeded 3 starter coupons (WELCOME10, FESTIVE5000, ROYAL20).');
+
+    // Seed sample reviews for the first package
+    const firstPackage = inserted[0];
+    const completedBooking = await Booking.create({
+      user: demoUser._id,
+      name: demoUser.name,
+      email: demoUser.email,
+      phone: demoUser.phone,
+      package: firstPackage._id,
+      packageName: firstPackage.title,
+      eventType: 'birthday',
+      eventDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+      guestCount: 45,
+      venue: 'Greenwood Banquet Hall',
+      budget: firstPackage.price,
+      status: 'completed',
+      priceDetails: {
+        originalPrice: firstPackage.price,
+        discountAmount: 2500,
+        finalPrice: firstPackage.price - 2500,
+        couponCode: 'WELCOME10',
+      },
+      history: [
+        { status: 'pending', updatedBy: 'client', note: 'Booking submitted' },
+        { status: 'confirmed', updatedBy: 'admin', note: 'Booking confirmed' },
+        { status: 'completed', updatedBy: 'admin', note: 'Event executed successfully' },
+      ],
+    });
+
+    await Review.create({
+      booking: completedBooking._id,
+      user: demoUser._id,
+      package: firstPackage._id,
+      userName: demoUser.name,
+      rating: 5,
+      comment: 'Incredible experience! The balloon decorations and catering were spot on. Kids had the best time.',
+      isApproved: true,
+    });
+    console.log('Seeded sample completed booking and review.');
 
     console.log('\n✅ Seed completed successfully!');
     console.log(`   Admin email:    ${admin.email}`);
