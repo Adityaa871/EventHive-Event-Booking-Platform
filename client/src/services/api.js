@@ -18,10 +18,15 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       localStorage.removeItem('admin');
-      // Redirect to admin login if on a protected page
-      if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin/login') {
-        window.location.href = '/admin/login';
+      // Redirect to login if on a protected page
+      if (
+        (window.location.pathname.startsWith('/admin') ||
+          window.location.pathname.startsWith('/my-bookings')) &&
+        window.location.pathname !== '/login'
+      ) {
+        window.location.href = '/login';
       }
     }
     return Promise.reject(error);

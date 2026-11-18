@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -17,7 +17,6 @@ import MyBookings from './pages/MyBookings';
 import NotFound from './pages/NotFound';
 
 // Admin pages
-import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageLeads from './pages/admin/ManageLeads';
 import ManagePackages from './pages/admin/ManagePackages';
@@ -39,17 +38,24 @@ const App = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/my-bookings" element={<MyBookings />} />
+            <Route
+              path="/my-bookings"
+              element={
+                <ProtectedRoute adminOnly={false}>
+                  <MyBookings />
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
-          {/* Admin login (no layout wrapper) */}
-          <Route path="/admin/login" element={<AdminLogin />} />
+          {/* Admin login redirect to unified login page */}
+          <Route path="/admin/login" element={<Navigate to="/login" replace />} />
 
           {/* Protected admin routes */}
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly={true}>
                 <AdminDashboard />
               </ProtectedRoute>
             }
@@ -57,7 +63,7 @@ const App = () => {
           <Route
             path="/admin/leads"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly={true}>
                 <ManageLeads />
               </ProtectedRoute>
             }
@@ -65,7 +71,7 @@ const App = () => {
           <Route
             path="/admin/packages"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly={true}>
                 <ManagePackages />
               </ProtectedRoute>
             }
@@ -73,7 +79,7 @@ const App = () => {
           <Route
             path="/admin/packages/new"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly={true}>
                 <PackageForm />
               </ProtectedRoute>
             }
@@ -81,7 +87,7 @@ const App = () => {
           <Route
             path="/admin/packages/:id/edit"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute adminOnly={true}>
                 <PackageForm />
               </ProtectedRoute>
             }
