@@ -186,13 +186,13 @@ const Footer = () => {
           </div>
           <div>
             <Link
-              to="/admin/login"
+              to="/login"
               className="text-muted"
               style={{ textDecoration: 'none', fontSize: '12px' }}
               onMouseEnter={(e) => (e.target.style.color = 'var(--text-primary)')}
               onMouseLeave={(e) => (e.target.style.color = 'var(--text-muted)')}
             >
-              Organizer portal
+              Client & Organizer Login
             </Link>
           </div>
         </div>

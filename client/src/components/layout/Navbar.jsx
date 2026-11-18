@@ -103,8 +103,8 @@ const Navbar = () => {
                       className="nav-link px-3 py-2 text-dark fw-semibold"
                       style={{ fontSize: '14px' }}
                     >
-                      <i className="bi bi-grid-1x2 me-1" />
-                      Admin
+                      <i className="bi bi-speedometer2 me-1 text-primary" />
+                      Admin Dashboard
                     </Link>
                   </li>
                 ) : (
@@ -124,34 +124,39 @@ const Navbar = () => {
                       })}
                     >
                       <i className="bi bi-calendar-check me-1" />
-                      Reservations
+                      My Reservations
                     </NavLink>
                   </li>
                 )}
 
-                <li className="nav-item">
+                <li className="nav-item ms-lg-2">
                   <button
                     type="button"
-                    className="btn btn-sm btn-link text-secondary text-decoration-none px-2"
+                    className="btn btn-outline-secondary btn-tactile btn-sm px-3"
                     style={{ fontSize: '13px' }}
                     onClick={() => {
                       logout();
                       closeMenu();
                     }}
                   >
-                    Sign Out
+                    <i className="bi bi-box-arrow-right me-1" />
+                    Logout
                   </button>
                 </li>
               </>
             ) : (
-              <li className="nav-item">
+              <li className="nav-item ms-lg-2">
                 <Link
                   to="/login"
                   onClick={closeMenu}
-                  className="nav-link px-3 py-2 text-secondary fw-semibold"
-                  style={{ fontSize: '14px' }}
+                  className="btn btn-outline-secondary btn-tactile btn-sm px-3"
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 600,
+                  }}
                 >
-                  Sign In
+                  <i className="bi bi-box-arrow-in-right me-1" aria-hidden="true" />
+                  Login
                 </Link>
               </li>
             )}

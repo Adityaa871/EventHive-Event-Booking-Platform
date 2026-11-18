@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPackages } from '../services/packageService';
 import Loader from '../components/common/Loader';
+import { useAuth } from '../context/AuthContext';
 
 const steps = [
   {
@@ -67,6 +68,7 @@ const stats = [
 export default function Home() {
   const [featuredPackages, setFeaturedPackages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -105,13 +107,27 @@ export default function Home() {
                 EventHive helps you plan a celebration that feels like yours.
               </p>
 
-              <div className="d-flex flex-wrap gap-3">
+              <div className="d-flex flex-wrap gap-3 align-items-center">
                 <Link to="/packages" className="btn event-btn-primary btn-lg">
                   Explore packages <i className="bi bi-arrow-right ms-2" aria-hidden="true" />
                 </Link>
                 <Link to="/book" className="btn event-btn-outline btn-lg">
                   Plan your event
                 </Link>
+                {!user ? (
+                  <Link to="/login" className="btn event-btn-outline-dark btn-lg">
+                    <i className="bi bi-box-arrow-in-right me-2" aria-hidden="true" />
+                    Login
+                  </Link>
+                ) : (
+                  <Link
+                    to={user.role === 'admin' ? '/admin' : '/my-bookings'}
+                    className="btn event-btn-outline-dark btn-lg"
+                  >
+                    <i className="bi bi-person-circle me-2" aria-hidden="true" />
+                    {user.role === 'admin' ? 'Admin Portal' : 'My Reservations'}
+                  </Link>
+                )}
               </div>
 
               <div className="event-stats" aria-label="EventHive at a glance">
