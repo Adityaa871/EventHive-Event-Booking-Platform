@@ -45,6 +45,7 @@ const createBooking = asyncHandler(async (req, res) => {
     budget,
     message,
     couponCode,
+    paymentDetails,
   } = req.body;
 
   const dateObj = new Date(eventDate);
@@ -119,6 +120,9 @@ const createBooking = asyncHandler(async (req, res) => {
 
   const finalPrice = Math.max(0, originalPrice - discountAmount);
 
+  const isPaid = paymentDetails?.status === 'paid';
+  const initialStatus = isPaid ? 'confirmed' : 'pending';
+
   // 4. Create booking
   const bookingData = {
     user: req.user ? req.user._id : null,
@@ -133,18 +137,29 @@ const createBooking = asyncHandler(async (req, res) => {
     venue: venue ? venue.trim() : '',
     budget: originalPrice,
     message: message ? message.trim() : '',
-    status: 'pending',
+    status: initialStatus,
     priceDetails: {
       originalPrice,
       discountAmount,
       finalPrice,
       couponCode: appliedCouponCode,
     },
+    paymentDetails: paymentDetails
+      ? {
+          status: paymentDetails.status || (isPaid ? 'paid' : 'pending'),
+          method: paymentDetails.method || 'card',
+          transactionId: paymentDetails.transactionId || (isPaid ? `TXN_${Date.now()}` : null),
+          paidAmount: paymentDetails.paidAmount || (isPaid ? finalPrice : 0),
+          paidAt: isPaid ? new Date() : null,
+        }
+      : undefined,
     history: [
       {
-        status: 'pending',
+        status: initialStatus,
         updatedBy: req.user ? 'client' : 'guest',
-        note: 'Booking request created.',
+        note: isPaid
+          ? `Payment verified via ${paymentDetails?.method?.toUpperCase() || 'GATEWAY'} (${paymentDetails?.transactionId || 'PAID'}). Booking confirmed.`
+          : 'Booking request created.',
         timestamp: new Date(),
       },
     ],
@@ -176,12 +191,18 @@ const createBooking = asyncHandler(async (req, res) => {
   await booking.populate('package', 'title category price inclusions images');
 
   // 6. Asynchronous email notification (never blocks response)
-  sendBookingSubmitted(booking).catch(() => {});
+  if (isPaid) {
+    sendBookingConfirmed(booking).catch(() => {});
+  } else {
+    sendBookingSubmitted(booking).catch(() => {});
+  }
 
   res.status(201).json({
     success: true,
     data: booking,
-    message: 'Booking request submitted successfully! We will contact you soon.',
+    message: isPaid
+      ? 'Payment verified and booking confirmed successfully!'
+      : 'Booking request submitted successfully! We will contact you soon.',
   });
 });
 

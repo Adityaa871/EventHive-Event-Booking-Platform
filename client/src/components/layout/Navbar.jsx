@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const navigationLinks = [
   { to: '/', label: 'Home' },
@@ -11,6 +12,7 @@ const navigationLinks = [
 const Navbar = () => {
   const [expanded, setExpanded] = useState(false);
   const closeMenu = () => setExpanded(false);
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   return (
     <nav
@@ -91,7 +93,70 @@ const Navbar = () => {
               </li>
             ))}
 
-            <li className="nav-item ms-lg-3 mt-2 mt-lg-0">
+            {isAuthenticated ? (
+              <>
+                {isAdmin ? (
+                  <li className="nav-item">
+                    <Link
+                      to="/admin"
+                      onClick={closeMenu}
+                      className="nav-link px-3 py-2 text-dark fw-semibold"
+                      style={{ fontSize: '14px' }}
+                    >
+                      <i className="bi bi-grid-1x2 me-1" />
+                      Admin
+                    </Link>
+                  </li>
+                ) : (
+                  <li className="nav-item">
+                    <NavLink
+                      to="/my-bookings"
+                      onClick={closeMenu}
+                      className={({ isActive }) =>
+                        `nav-link px-3 py-2 rounded-2 ${isActive ? 'fw-bold text-dark' : 'text-secondary'}`
+                      }
+                      style={({ isActive }) => ({
+                        fontSize: '14px',
+                        fontWeight: isActive ? 600 : 500,
+                        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        backgroundColor: isActive ? 'var(--bg-surface-subtle)' : 'transparent',
+                        transition: 'all 0.15s ease',
+                      })}
+                    >
+                      <i className="bi bi-calendar-check me-1" />
+                      Reservations
+                    </NavLink>
+                  </li>
+                )}
+
+                <li className="nav-item">
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-link text-secondary text-decoration-none px-2"
+                    style={{ fontSize: '13px' }}
+                    onClick={() => {
+                      logout();
+                      closeMenu();
+                    }}
+                  >
+                    Sign Out
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li className="nav-item">
+                <Link
+                  to="/login"
+                  onClick={closeMenu}
+                  className="nav-link px-3 py-2 text-secondary fw-semibold"
+                  style={{ fontSize: '14px' }}
+                >
+                  Sign In
+                </Link>
+              </li>
+            )}
+
+            <li className="nav-item ms-lg-2 mt-2 mt-lg-0">
               <Link
                 to="/book"
                 onClick={closeMenu}

@@ -77,6 +77,30 @@ const bookingSchema = new mongoose.Schema(
       finalPrice: { type: Number, default: 0 },
       couponCode: { type: String, default: null },
     },
+    // Payment Gateway Details
+    paymentDetails: {
+      status: {
+        type: String,
+        enum: ['pending', 'paid', 'partially_paid', 'failed'],
+        default: 'pending',
+      },
+      method: {
+        type: String,
+        default: null,
+      },
+      transactionId: {
+        type: String,
+        default: null,
+      },
+      paidAmount: {
+        type: Number,
+        default: 0,
+      },
+      paidAt: {
+        type: Date,
+        default: null,
+      },
+    },
     // Cancellation request workflow
     cancellationRequest: {
       requested: { type: Boolean, default: false },

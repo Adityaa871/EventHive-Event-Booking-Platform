@@ -11,6 +11,9 @@ import PackageDetails from './pages/PackageDetails';
 import Booking from './pages/Booking';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import MyBookings from './pages/MyBookings';
 import NotFound from './pages/NotFound';
 
 // Admin pages
@@ -26,7 +29,7 @@ const App = () => {
       <AuthProvider>
         <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
         <Routes>
-          {/* Public routes */}
+          {/* Public & Customer routes with layout */}
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/packages" element={<Packages />} />
@@ -34,6 +37,9 @@ const App = () => {
             <Route path="/book" element={<Booking />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/my-bookings" element={<MyBookings />} />
           </Route>
 
           {/* Admin login (no layout wrapper) */}
